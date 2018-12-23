@@ -1,0 +1,3 @@
+[submodule "deps/dependcies"]
+	path = deps/dependcies
+	url = https://github.com/blackknifes/dependcies.git
