@@ -94,7 +94,6 @@ public:
 	virtual __int64 tellWrite() const override;
 
 private:
-	GObjectImplements(GFileIO);
 	GObjectClass(GFileIO);
 
 	HANDLE m_hReadFile;

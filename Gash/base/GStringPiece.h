@@ -1,28 +1,13 @@
 #ifndef __GSTRINGPIECE_H__
 #define __GSTRINGPIECE_H__
 #include "GString.h"
-#include "GStringPieceIterator.h"
 
 //字符串片段，必须保证原字符串内存不被释放或修改
 class GStringPiece
 {
 public:
-	typedef std::wstring::const_iterator const_iterator;
-
-	static const size_t npos = std::wstring::npos;
-
-	static GStringPiece From(const GString& str);
-	static GStringPiece From(const GString& str, size_t size);
-	static GStringPiece From(const GString& str, size_t _start, size_t _end);
-
-	static GStringPiece From(const std::wstring& str);
-	static GStringPiece From(const std::wstring& str, size_t size);
-	static GStringPiece From(const std::wstring& str, size_t _start, size_t _end);
-
-	static GStringPiece From(const wchar_t* str);
-	static GStringPiece From(const wchar_t* _start, const wchar_t* _end);
-	static GStringPiece From(const wchar_t* str, size_t size);
-	static GStringPiece From(const wchar_t* str, size_t _start, size_t _end);
+	typedef GString::const_iterator const_iterator;
+	static const size_t npos = GString::npos;
 
 	GStringPiece();
 	GStringPiece(const GString& str);
@@ -32,16 +17,10 @@ public:
 	GStringPiece(const std::wstring& str);
 	GStringPiece(const std::wstring& str, size_t size);
 	GStringPiece(const std::wstring& str, size_t _start, size_t _end);
-
-
-	GStringPiece(const GStringPieceIterator& _begin, const GStringPieceIterator& _end);
 	GStringPiece(const_iterator _begin, const_iterator _end);
-	GStringPiece(const wchar_t* str);
-	GStringPiece(const wchar_t* _begin, const wchar_t* _end);
-	GStringPiece(const wchar_t* _begin, size_t size);
 
-	GStringPieceIterator begin() const;
-	GStringPieceIterator end() const;
+	const_iterator begin() const;
+	const_iterator end() const;
 
 	size_t size() const;
 	bool empty() const;
@@ -65,19 +44,9 @@ public:
 	bool endsWith(const GStringPiece& str, bool caseSentive = true) const;
 	bool endsWithSeperator() const;
 	bool startsWithSeperator() const;
-
-	GString addStartsWith(const GStringPiece& str, bool caseSentive = true) const;
-	GString addEndsWith(const GStringPiece& str, bool caseSentive = true) const;
-	GString addEndsWithSeperator() const;
-	GString addStartsWithSeperator() const;
-
 	bool isUpper() const;
 	bool isLower() const;
 	bool isNumber() const;
-	bool isBool() const;
-
-	GString toUpper() const;
-	GString toLower() const;
 
 	bool toBool() const;
 	int toInt() const;
@@ -89,20 +58,25 @@ public:
 
 	GStringPiece substr(size_t offset, size_t count = npos) const;
 	GStringPiece slice(size_t _start, size_t _end = npos) const;
-
-	size_t copy(wchar_t* buffer, size_t bufsize) const;
-	size_t insert(GString& str, size_t offset, size_t count = npos) const;
-	size_t append(GString& str, size_t count = npos) const;
-
 	size_t find(const GStringPiece& str, size_t offset = 0, bool caseSentive = true) const;
 	size_t findFirst(const GStringPiece& str, size_t offset = 0, bool caseSentive = true) const;
 	size_t findFirstNot(const GStringPiece& str, size_t offset = 0, bool caseSentive = true) const;
 	size_t findLast(const GStringPiece& str, size_t offset = npos, bool caseSentive = true) const;
 	size_t findLastNot(const GStringPiece& str, size_t offset = npos, bool caseSentive = true) const;
 
+
+	size_t find(const wchar_t* str, size_t offset = 0, bool caseSentive = true) const;
+	size_t findFirst(const wchar_t* str, size_t offset = 0, bool caseSentive = true) const;
+	size_t findFirstNot(const wchar_t* str, size_t offset = 0, bool caseSentive = true) const;
+	size_t findLast(const wchar_t* str, size_t offset = npos, bool caseSentive = true) const;
+	size_t findLastNot(const wchar_t* str, size_t offset = npos, bool caseSentive = true) const;
+
+
 	GString toString() const;
+
+	size_t read(wchar_t* pOut, size_t readsize) const;
 private:
-	GStringPieceIterator m_begin;
-	GStringPieceIterator m_end;
+	const_iterator m_begin;
+	const_iterator m_end;
 };
 #endif

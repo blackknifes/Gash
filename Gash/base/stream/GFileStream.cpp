@@ -34,6 +34,11 @@ void GFileOutputStream::flush()
 	getDevice()->flush();
 }
 
+void GFileOutputStream::end()
+{
+	getDevice()->close();
+}
+
 GFileStream::GFileStream(
 	const GString& path, 
 	Operations op /*= Operation::Create*/, 

@@ -109,6 +109,7 @@ void GUrlParts::parse(const GString& val)
 	GStringPiece tmp = GRegex::StringPiece(results[1]);
 	if(!tmp.empty())
 		m_strProtocol = GStringPiece(tmp.begin(), tmp.end() - 2);
+	
 	tmp = GRegex::StringPiece(results[2]);
 	if (!tmp.empty())
 	{
@@ -137,14 +138,14 @@ void GUrlParts::parse(const GString& val)
 		m_strHash = GStringPiece(m_strHash.begin() + 1, m_strHash.end());
 
 	if(!m_strHostname.empty())
-		m_strHost = GStringPiece(m_strHostname.begin().toStdIterator(), results[4].second);
+		m_strHost = GStringPiece(m_strHostname.begin(), results[4].second);
 	if(!m_strHost.empty())
-		m_strOrigin = GStringPiece(m_strUrl.begin(), m_strHost.end().toStdIterator());
+		m_strOrigin = GStringPiece(m_strUrl.begin(), m_strHost.end());
 
 	if (m_iPort == 0)
 	{
 		wchar_t protocol[128];
-		size_t readsize = m_strProtocol.copy(protocol, 128);
+		size_t readsize = m_strProtocol.read(protocol, 128);
 		if (readsize == 0 || readsize == 128)
 			return;
 		protocol[readsize - 1] = 0;

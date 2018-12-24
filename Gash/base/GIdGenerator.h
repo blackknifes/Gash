@@ -4,7 +4,7 @@
 #include <atomic>
 
 template<typename _Ty, typename _idTy = __int64>
-class GIdGenerator: public GSingleton<GIdGenerator>
+class GIdGenerator: public GSingleton<GIdGenerator<_Ty, _idTy>>
 {
 public:
 	typedef _idTy id_type;
@@ -12,7 +12,7 @@ public:
 
 	static id_type GenerateId()
 	{
-		return getInstance()->genId();
+		return GIdGenerator::getInstance()->genId();
 	}
 
 	id_type genId()
@@ -20,6 +20,12 @@ public:
 		return ++m_id;
 	}
 private:
-	std::atomic<id_type> m_id;
+	std::atomic<_idTy> m_id;
 };
+
+template<typename _Ty, typename _idTy>
+_idTy GenerateId()
+{
+	return GIdGenerator<_Ty, _idTy>::GenerateId();
+}
 #endif

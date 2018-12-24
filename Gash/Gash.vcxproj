@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{D483C8C3-3EBF-4C68-A717-D9999319F85B}</ProjectGuid>
+    <RootNamespace>Gash</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;CARES_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;base64.lib;cares.lib;libiconv.lib;mbedcrypto.lib;mbedtls.lib;mbedx509.lib;stb.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;CARES_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;base64.lib;cares.lib;libiconv.lib;mbedcrypto.lib;mbedtls.lib;mbedx509.lib;stb.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;CARES_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;base64.lib;cares.lib;libiconv.lib;mbedcrypto.lib;mbedtls.lib;mbedx509.lib;stb.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;CARES_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4267;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\dependcies\out$(PlatformShortName)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;base64.lib;cares.lib;libiconv.lib;mbedcrypto.lib;mbedtls.lib;mbedx509.lib;stb.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="base\algorithm\GEncoder.cpp" />
+    <ClCompile Include="base\algorithm\md5\md5.c" />
+    <ClCompile Include="base\async\fileio\GAsyncDevice.cpp" />
+    <ClCompile Include="base\async\fileio\GAsyncFile.cpp" />
+    <ClCompile Include="base\async\fileio\GAsyncHttp.cpp" />
+    <ClCompile Include="base\async\fileio\GAsyncIO.cpp" />
+    <ClCompile Include="base\async\fileio\GAsyncTCPSocket.cpp" />
+    <ClCompile Include="base\async\GAsyncEngine.cpp" />
+    <ClCompile Include="base\async\GAsyncLoop.cpp" />
+    <ClCompile Include="base\charset\GEncoding.cpp" />
+    <ClCompile Include="base\ComInit.cpp" />
+    <ClCompile Include="base\device\GDevice.cpp" />
+    <ClCompile Include="base\device\GFileDevice.cpp" />
+    <ClCompile Include="base\device\GSocket.cpp" />
+    <ClCompile Include="base\FileDialog\GFileDialog.cpp" />
+    <ClCompile Include="base\GAllocator.cpp" />
+    <ClCompile Include="base\GBuffer.cpp" />
+    <ClCompile Include="base\GDataArray.cpp" />
+    <ClCompile Include="base\GGlobalFunction.cpp" />
+    <ClCompile Include="base\GPath.cpp" />
+    <ClCompile Include="base\GRegex.cpp" />
+    <ClCompile Include="base\GShell.cpp" />
+    <ClCompile Include="base\GString.cpp" />
+    <ClCompile Include="base\GStringPiece.cpp" />
+    <ClCompile Include="base\GStringPieceIterator.cpp" />
+    <ClCompile Include="base\GUrlParts.cpp" />
+    <ClCompile Include="base\GValue.cpp" />
+    <ClCompile Include="base\GWin32BaseTypeRegistry.cpp" />
+    <ClCompile Include="base\io\GBufferIO.cpp" />
+    <ClCompile Include="base\io\GFile.cpp" />
+    <ClCompile Include="base\io\GFileIO.cpp" />
+    <ClCompile Include="base\io\GIODevice.cpp" />
+    <ClCompile Include="base\net\GHttpClient.cpp" />
+    <ClCompile Include="base\platform\win32\GWin32Service.cpp" />
+    <ClCompile Include="base\platform\win32\GWin32SystemServiceManager.cpp" />
+    <ClCompile Include="base\reflection\GClass.cpp" />
+    <ClCompile Include="base\reflection\GConstructor.cpp" />
+    <ClCompile Include="base\reflection\GField.cpp" />
+    <ClCompile Include="base\reflection\GFunction.cpp" />
+    <ClCompile Include="base\reflection\GReflectionManager.cpp" />
+    <ClCompile Include="base\reflection\GUserType.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionAnd.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionCallback.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionCancelable.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionEvent.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionInterval.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionNot.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionOnce.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionOr.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionOvercount.cpp" />
+    <ClCompile Include="base\schedule\condition\GConditionTimeout.cpp" />
+    <ClCompile Include="base\schedule\GSchedulerCondition.cpp" />
+    <ClCompile Include="base\schedule\GSchedulerManager.cpp" />
+    <ClCompile Include="base\schedule\GSchedulerOnce.cpp" />
+    <ClCompile Include="base\schedule\GTaskCallback.cpp" />
+    <ClCompile Include="base\stream\GBufferStream.cpp" />
+    <ClCompile Include="base\stream\GEncodeStream.cpp" />
+    <ClCompile Include="base\stream\GEncodingTransform.cpp" />
+    <ClCompile Include="base\stream\GFileStream.cpp" />
+    <ClCompile Include="base\stream\GIOStream.cpp" />
+    <ClCompile Include="base\stream\GMultiStream.cpp" />
+    <ClCompile Include="base\stream\GStream.cpp" />
+    <ClCompile Include="base\stream\GStreamDevice.cpp" />
+    <ClCompile Include="base\stream\GTextStream.cpp" />
+    <ClCompile Include="base\sync\GLocker.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base\algorithm\GEncoder.h" />
+    <ClInclude Include="base\algorithm\md5\md5.h" />
+    <ClInclude Include="base\async\fileio\GAsyncDevice.h" />
+    <ClInclude Include="base\async\fileio\GAsyncFile.h" />
+    <ClInclude Include="base\async\fileio\GAsyncHttp.h" />
+    <ClInclude Include="base\async\fileio\GAsyncIO.h" />
+    <ClInclude Include="base\async\fileio\GAsyncTCPSocket.h" />
+    <ClInclude Include="base\async\fileio\GHttpRequest.h" />
+    <ClInclude Include="base\async\fileio\GHttpResponse.h" />
+    <ClInclude Include="base\async\GAsyncEngine.h" />
+    <ClInclude Include="base\async\GAsyncLoop.h" />
+    <ClInclude Include="base\block_container\GBlockingQueue.h" />
+    <ClInclude Include="base\charset\GEncoding.h" />
+    <ClInclude Include="base\device\GDevice.h" />
+    <ClInclude Include="base\device\GFileDevice.h" />
+    <ClInclude Include="base\device\GSocket.h" />
+    <ClInclude Include="base\FileDialog\GFileDialog.h" />
+    <ClInclude Include="base\GAllocator.h" />
+    <ClInclude Include="base\GArray.h" />
+    <ClInclude Include="base\GBuffer.h" />
+    <ClInclude Include="base\GDataArray.h" />
+    <ClInclude Include="base\GDepsIncludes.h" />
+    <ClInclude Include="base\GEnums.h" />
+    <ClInclude Include="base\GGlobalFunction.h" />
+    <ClInclude Include="base\GIdGenerator.h" />
+    <ClInclude Include="base\GMemoryPool.h" />
+    <ClInclude Include="base\GObject.h" />
+    <ClInclude Include="base\GObjectPool.h" />
+    <ClInclude Include="base\GObjectPooled.h" />
+    <ClInclude Include="base\GPath.h" />
+    <ClInclude Include="base\GRegex.h" />
+    <ClInclude Include="base\GScopePointer.h" />
+    <ClInclude Include="base\GShell.h" />
+    <ClInclude Include="base\GSingleton.h" />
+    <ClInclude Include="base\GString.h" />
+    <ClInclude Include="base\GStringPiece.h" />
+    <ClInclude Include="base\GStringPieceIterator.h" />
+    <ClInclude Include="base\GStrings.h" />
+    <ClInclude Include="base\GTypes.h" />
+    <ClInclude Include="base\GUrlParts.h" />
+    <ClInclude Include="base\GValue.h" />
+    <ClInclude Include="base\GValueConverter.h" />
+    <ClInclude Include="base\GWin32BaseTypeRegistry.h" />
+    <ClInclude Include="base\io\GBufferIO.h" />
+    <ClInclude Include="base\io\GFile.h" />
+    <ClInclude Include="base\io\GFileIO.h" />
+    <ClInclude Include="base\io\GIODevice.h" />
+    <ClInclude Include="base\math\GMath.h" />
+    <ClInclude Include="base\net\GDnsQuery.h" />
+    <ClInclude Include="base\net\GHttpClient.h" />
+    <ClInclude Include="base\net\GOverlappedCallback.h" />
+    <ClInclude Include="base\platform\GService.h" />
+    <ClInclude Include="base\platform\GSystemServiceManager.h" />
+    <ClInclude Include="base\platform\win32\GWin32Service.h" />
+    <ClInclude Include="base\platform\win32\GWin32SystemServiceManager.h" />
+    <ClInclude Include="base\reflection\GClass.h" />
+    <ClInclude Include="base\reflection\GClassRegistry.h" />
+    <ClInclude Include="base\reflection\GConstructor.h" />
+    <ClInclude Include="base\reflection\GField.h" />
+    <ClInclude Include="base\reflection\GFieldGetter.h" />
+    <ClInclude Include="base\reflection\GFieldSetter.h" />
+    <ClInclude Include="base\reflection\GFunction.h" />
+    <ClInclude Include="base\reflection\GFunctionTraits.h" />
+    <ClInclude Include="base\reflection\GReflectionBase.h" />
+    <ClInclude Include="base\reflection\GReflectionManager.h" />
+    <ClInclude Include="base\reflection\GReflectionObject.h" />
+    <ClInclude Include="base\reflection\GUserType.h" />
+    <ClInclude Include="base\reflection\GUserTypeRegister.h" />
+    <ClInclude Include="base\schedule\condition\GCondition.h" />
+    <ClInclude Include="base\schedule\condition\GConditionAnd.h" />
+    <ClInclude Include="base\schedule\condition\GConditionCallback.h" />
+    <ClInclude Include="base\schedule\condition\GConditionCancelable.h" />
+    <ClInclude Include="base\schedule\condition\GConditionEvent.h" />
+    <ClInclude Include="base\schedule\condition\GConditionInterval.h" />
+    <ClInclude Include="base\schedule\condition\GConditionNot.h" />
+    <ClInclude Include="base\schedule\condition\GConditionOnce.h" />
+    <ClInclude Include="base\schedule\condition\GConditionOr.h" />
+    <ClInclude Include="base\schedule\condition\GConditionOvercount.h" />
+    <ClInclude Include="base\schedule\condition\GConditionTimeout.h" />
+    <ClInclude Include="base\schedule\GScheduler.h" />
+    <ClInclude Include="base\schedule\GSchedulerCondition.h" />
+    <ClInclude Include="base\schedule\GSchedulerManager.h" />
+    <ClInclude Include="base\schedule\GSchedulerOnce.h" />
+    <ClInclude Include="base\schedule\GTask.h" />
+    <ClInclude Include="base\schedule\GTaskCallback.h" />
+    <ClInclude Include="base\stream\GBufferStream.h" />
+    <ClInclude Include="base\stream\GEncodeStream.h" />
+    <ClInclude Include="base\stream\GEncodingTransform.h" />
+    <ClInclude Include="base\stream\GFileStream.h" />
+    <ClInclude Include="base\stream\GIOStream.h" />
+    <ClInclude Include="base\stream\GMultiStream.h" />
+    <ClInclude Include="base\stream\GStream.h" />
+    <ClInclude Include="base\stream\GStreamDevice.h" />
+    <ClInclude Include="base\stream\GTextStream.h" />
+    <ClInclude Include="base\sync\GLocker.h" />
+    <ClInclude Include="Gash.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

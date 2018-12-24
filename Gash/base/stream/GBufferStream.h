@@ -13,11 +13,12 @@ public:
 	virtual void write(const void* pData, size_t _size) override;
 	virtual void flush() override;
 
+	virtual size_t readline(void* pBuffer, size_t bufsize);
+
 	size_t size() const;
 	size_t capacity() const;
 	GDataArray readAll();
 private:
-	GObjectImplements(GBufferStream);
-	GObjectClass(GBufferStream);
+	GObjectClassPooled(GBufferStream);
 };
 #endif

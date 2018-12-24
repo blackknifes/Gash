@@ -21,6 +21,7 @@ public:
 
 	GRegex();
 	GRegex(const wchar_t* re);
+	GRegex(const std::wstring& re);
 	GRegex(const GString& re);
 	GRegex(const GRegex& re);
 	GRegex(GRegex&& re);

@@ -1,0 +1,507 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="base\FileDialog\GFileDialog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GBufferIO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GFileIO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GIODevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GClass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GConstructor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GField.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GFunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GReflectionManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\reflection\GUserType.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GBufferStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GFileStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GIOStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GStreamDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GTextStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\sync\GLocker.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\ComInit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GDataArray.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GGlobalFunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GPath.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GRegex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GShell.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GString.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GStringPiece.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GStringPieceIterator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GUrlParts.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GValue.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GWin32BaseTypeRegistry.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\algorithm\md5\md5.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\algorithm\GEncoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\fileio\GAsyncDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\fileio\GAsyncFile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\fileio\GAsyncHttp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\fileio\GAsyncIO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\fileio\GAsyncTCPSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\GAsyncEngine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\async\GAsyncLoop.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\charset\GEncoding.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\device\GDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\device\GFileDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\device\GSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\net\GHttpClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\platform\win32\GWin32Service.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\platform\win32\GWin32SystemServiceManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionAnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionCallback.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionCancelable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionEvent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionInterval.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionNot.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionOnce.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionOr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionOvercount.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\condition\GConditionTimeout.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\GSchedulerCondition.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\GSchedulerManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\GSchedulerOnce.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\schedule\GTaskCallback.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GEncodeStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GEncodingTransform.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GMultiStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GAllocator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base\FileDialog\GFileDialog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GBufferIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GFileIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GIODevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GClass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GClassRegistry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GConstructor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GField.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GFieldGetter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GFieldSetter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GFunctionTraits.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GReflectionBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GReflectionManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GReflectionObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GUserType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\reflection\GUserTypeRegister.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GBufferStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GFileStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GIOStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GStreamDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GTextStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\sync\GLocker.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GArray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GDataArray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GEnums.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GGlobalFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GIdGenerator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GMemoryPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GObjectPooled.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GPath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GRegex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GScopePointer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GShell.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GSingleton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GString.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GStringPiece.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GStringPieceIterator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GTypes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GUrlParts.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GValue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GValueConverter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GWin32BaseTypeRegistry.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Gash.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\algorithm\md5\md5.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\algorithm\GEncoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GAsyncDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GAsyncFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GAsyncHttp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GAsyncIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GAsyncTCPSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GHttpRequest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\fileio\GHttpResponse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\GAsyncEngine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\async\GAsyncLoop.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\block_container\GBlockingQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\charset\GEncoding.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\device\GDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\device\GFileDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\device\GSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\net\GHttpClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\win32\GWin32Service.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\win32\GWin32SystemServiceManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\GService.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\GSystemServiceManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GCondition.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionAnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionCallback.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionCancelable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionInterval.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionNot.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionOnce.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionOr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionOvercount.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\condition\GConditionTimeout.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GScheduler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GSchedulerCondition.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GSchedulerManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GSchedulerOnce.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GTask.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\schedule\GTaskCallback.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GEncodeStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GEncodingTransform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GMultiStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GDepsIncludes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GObjectPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GStrings.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\net\GDnsQuery.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\net\GOverlappedCallback.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\math\GMath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GAllocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

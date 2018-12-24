@@ -1576,11 +1576,11 @@ GValue::~GValue()
 void GValue::assign(const GStringPiece& str)
 {
 	if (m_type == GType::TypeString)
-		*m_strValue = str;
+		*m_strValue = str.toString();
 	else
 	{
 		reset();
-		m_strValue = PopFromGlobalPool<GString>(GString(str));
+		m_strValue = PopFromGlobalPool<GString>(str.toString());
 		m_type = GType::TypeString;
 	}
 }

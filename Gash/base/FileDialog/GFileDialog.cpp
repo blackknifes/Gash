@@ -2,6 +2,8 @@
 #include <CommCtrl.h>
 #include <locale.h>
 #include <shlwapi.h>
+#include <WinUser.h>
+#include <commdlg.h>
 
 #pragma warning(disable: 4267)
 

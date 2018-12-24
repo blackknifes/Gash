@@ -26,8 +26,7 @@ public:
 	virtual const GInputStream& operator >>(GDataArray& val) override;
 
 private:
-	GObjectImplements(GTextInputStream);
-	GObjectClass(GTextInputStream);
+	GObjectClassPooled(GTextInputStream);
 	GInputStreamPtr m_pInputStream;
 	Encoding m_encoding;
 };
@@ -57,8 +56,7 @@ public:
 	virtual const GOutputStream& operator <<(const GDataArray& val) override;
 
 private:
-	GObjectImplements(GTextOutputStream);
-	GObjectClass(GTextOutputStream);
+	GObjectClassPooled(GTextOutputStream);
 	GOutputStreamPtr m_pOutputStream;
 	Encoding m_encoding;
 };

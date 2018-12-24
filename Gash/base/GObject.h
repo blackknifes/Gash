@@ -4,27 +4,44 @@
 #include "GScopePointer.h"
 #include "GEnums.h"
 #include "GGlobalFunction.h"
+#include "GMemoryPool.h"
+#include "GAllocator.h"
 
 GREFPTR_DEF(GObject);
 
+#define GObjectImplementsBase(_Class) \
+public: \
+	virtual void AddRef() { ++m_referenceCount; } \
+	virtual bool Release() { if(--m_referenceCount == 0) { this->destroy(); return true; }; return false; } \
+	virtual ref_type GetReferenceCount() const { return m_referenceCount; }; \
+private: \
+	std::atomic<unsigned int> m_referenceCount;
+
 #define GObjectImplements(_Class) \
+GObjectImplementsBase(_Class) \
 public: \
-	virtual void AddRef() { ++m_referenceCount; } \
-	virtual bool Release() { if(--m_referenceCount == 0) { this->destroy(); return true; }; return false; } \
-	virtual ref_type GetReferenceCount() const { return m_referenceCount; }; \
-	virtual void destroy() { delete this; }; \
-private: \
-	std::atomic<unsigned int> m_referenceCount;
+	virtual void destroy() { delete this; };
 
-#define GObjectImplements2(_Class) \
+
+#define GObjectImplementsPooled(_Class) \
+GObjectImplementsBase(_Class) \
 public: \
-	virtual void AddRef() { ++m_referenceCount; } \
-	virtual bool Release() { if(--m_referenceCount == 0) { this->destroy(); return true; }; return false; } \
-	virtual ref_type GetReferenceCount() const { return m_referenceCount; }; \
-private: \
-	std::atomic<unsigned int> m_referenceCount;
+	template<typename... _argsTy> \
+	static GScopePointer<_Class> New(_argsTy... args) \
+	{ \
+		return GNewObject<_Class>(args...); \
+	} \
+	virtual void destroy() override \
+	{ \
+		GDestroyObject(this); \
+	} \
+	friend void GDestroyObject<_Class>(_Class*); \
+private:
 
-#define GObjectClass(_Class) private: _Class(const _Class&); _Class(_Class&&);
+#define GDisallowAssignAndCopy(_Class) private: _Class(const _Class&); _Class(_Class&&);
+
+#define GObjectClass(_Class) GObjectImplements(_Class); GDisallowAssignAndCopy(_Class)
+#define GObjectClassPooled(_Class) GObjectImplementsPooled(_Class); GDisallowAssignAndCopy(_Class)
 
 class GObject
 {

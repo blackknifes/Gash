@@ -7,7 +7,7 @@
 
 GREFPTR_DEF(GIODevice);
 
-class GIODevice: public GObject
+class GIODevice: public virtual GObject
 {
 public:
 	enum SeekType

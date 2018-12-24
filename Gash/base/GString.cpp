@@ -1,45 +1,114 @@
 #include "GString.h"
-#include <Windows.h>
-#include "GStringPiece.h"
 #include "GRegex.h"
 
-namespace
+static void AssignStringWithEncoding(std::wstring& wstr, const char* str, size_t size, GEncoding encoding)
 {
-	GString ConverToGString(DWORD codePage, const char* str, int len = -1)
+	wchar_t buf[2048];
+
+	const char* ptr = str;
+	if(size == -1)
+		size = strlen(str);
+	wchar_t* ptr2 = buf;
+	size_t bufsize = sizeof(buf);
+	Encoder* pEncoder = FindEncoder(encoding, EncodingUtf16LE);
+	if (pEncoder)
 	{
-		GString tmp;
-		if (len == -1)
-			len = strlen(str);
-		int wlen = MultiByteToWideChar(codePage, 0, str, len, 0, 0);
-		if (wlen <= 0)
-			return std::move(tmp);
-		tmp.resize(wlen);
-		MultiByteToWideChar(codePage, 0, str, len, (wchar_t*)tmp.data(), wlen);
-		return std::move(tmp);
+		while (size != 0 && !EncodeIsCritical(EncodeString(pEncoder, (const void**)&ptr, &size, (void**)&ptr2, &bufsize)))
+		{
+			wstr.append(buf, (sizeof(buf) - bufsize) >> 1);
+			ptr2 = buf;
+			bufsize = sizeof(buf);
+		}
 	}
 }
 
-GString GString::FromAnsi(const char* str)
+static std::string ConvertEncoding(const std::wstring& wstr, GEncoding to = EncodingGBK)
 {
-	return ConverToGString(CP_ACP, str);
+	std::string str;
+	str.reserve(wstr.size());
+	char buf[4096] = {};
+	Encoder* pEncoder = FindEncoder(EncodingUtf16LE, to);
+	const void* pData = wstr.data();
+	size_t srcsize = wstr.size() << 1;
+	size_t bufsize = sizeof(buf);
+	char* ptr = buf;
+	if (pEncoder)
+	{
+		while (srcsize != 0 && !EncodeIsCritical(EncodeString(pEncoder, &pData, &srcsize, (void**)&ptr, &bufsize)))
+		{
+			str.append(buf, sizeof(buf) - bufsize);
+			ptr = buf;
+			bufsize = sizeof(buf);
+		}
+	}
+	return std::move(str);
 }
 
-GString GString::FromAnsi(const char* str, int bytes)
+static int CompareString(const wchar_t* lbegin, const wchar_t* lend, const wchar_t* rbegin, const wchar_t* rend, bool caseSentive = false)
 {
-	return ConverToGString(CP_ACP, str, bytes);
+	if(caseSentive)
+	{
+		while (lbegin != lend && rbegin != rend && *lbegin == *rbegin)
+		{
+			++lbegin;
+			++rbegin;
+		}
+		if (*lbegin > *rbegin)
+			return 1;
+		else if (*lbegin < *rbegin)
+			return -1;
+		return 0;
+	}
+	while (lbegin != lend && rbegin != rend && ::tolower(*lbegin) == ::tolower(*rbegin))
+	{
+		++lbegin;
+		++rbegin;
+	}
+	if (::tolower(*lbegin) > ::tolower(*rbegin))
+		return 1;
+	else if (::tolower(*lbegin) < ::tolower(*rbegin))
+		return -1;
+	return 0;
 }
 
-GString GString::FromUtf8(const char* str)
+GString GString::FromEncoding(const char* str, GEncoding encoding /*= EncodingAnsi*/)
 {
-	return ConverToGString(CP_UTF8, str);
+	return GString(str, encoding);
 }
 
-GString GString::FromUtf8(const char* str, int bytes)
+GString GString::FromEncoding(const char* str, size_t size, GEncoding encoding /*= EncodingAnsi*/)
 {
-	return ConverToGString(CP_UTF8, str, bytes);
+	return GString(str, size, encoding);
+}
+
+GString GString::FromStringPiece(const_iterator _begin, const_iterator _end)
+{
+	return GString(_begin, _end);
 }
 
 GString::GString()
+{
+
+}
+
+GString::GString(const char* str, GEncoding encoding /*= EncodingAnsi*/)
+{
+	AssignStringWithEncoding(m_string, str, -1, encoding);
+}
+
+GString::GString(const char* str, size_t size, GEncoding encoding /*= EncodingAnsi*/)
+{
+	AssignStringWithEncoding(m_string, str, size, encoding);
+}
+
+GString::GString(const wchar_t* str)
+	:m_string(str)
+{
+
+}
+
+GString::GString(const wchar_t* str, size_t size)
+	: m_string(str, size)
 {
 
 }
@@ -56,92 +125,74 @@ GString::GString(GString&& str)
 
 }
 
-GString::GString(const wchar_t* str)
-	: m_string(str)
+GString::GString(const_iterator _begin, const_iterator _end)
+	:m_string(_begin, _end)
 {
 
 }
 
-GString::GString(const std::wstring& str)
-	: m_string(str)
+const GString& GString::operator+=(const wchar_t* str)
 {
-
-}
-
-GString::GString(std::wstring&& str)
-	: m_string(std::move(str))
-{
-
-}
-
-GString::GString(const GStringPiece& piece)
-{
-	*this = piece.toString();
-}
-
-const GString& GString::operator=(std::wstring&& str)
-{
-	m_string = std::move(str);
+	m_string += str;
 	return *this;
 }
 
-const GString& GString::operator=(const GStringPiece& piece)
+const GString& GString::operator+=(const GString& str)
 {
-	return assign(piece);
-}
-
-bool GString::operator==(const GStringPiece& str) const
-{
-	return GStringPiece(m_string) == str;
-}
-bool GString::operator!=(const GStringPiece& str) const
-{
-	return GStringPiece(m_string) != str;
-}
-
-const GString& GString::operator=(const GString& str)
-{
-	m_string = str.m_string;
+	m_string += str.m_string;
 	return *this;
 }
 
-bool GString::operator==(const GString& str) const
+GString GString::operator+(const GString& str) const
 {
-	return m_string == str.m_string;
+	GString tmp = *this;
+	return tmp += str;
 }
 
-bool GString::operator==(const wchar_t* str) const
+GString GString::operator+(const wchar_t* str) const
 {
-	return operator==(GStringPiece(str));
+	GString tmp = *this;
+	return tmp += str;
 }
 
-bool GString::operator>(const GStringPiece& str) const
+bool GString::operator>(const GString& str) const
 {
-	return GStringPiece(m_string) > str;
-}
-bool GString::operator<(const GStringPiece& str) const
-{
-	return GStringPiece(m_string) < str;
-}
-bool GString::operator>=(const GStringPiece& str) const
-{
-	return GStringPiece(m_string) >= str;
-}
-bool GString::operator<=(const GStringPiece& str) const
-{
-	return GStringPiece(m_string) <= str;
+	return m_string.compare(str.m_string) > 0;
 }
 
-const GString& GString::operator+=(const GStringPiece& piece)
+bool GString::operator>(const wchar_t* str) const
 {
-	return append(piece);
+	return m_string.compare(str) > 0;
 }
 
-GString GString::operator+(const GStringPiece& piece) const
+bool GString::operator>=(const GString& str) const
 {
-	GString str = *this;
-	str += piece;
-	return std::move(str);
+	return m_string.compare(str.m_string) >= 0;
+}
+
+bool GString::operator>=(const wchar_t* str) const
+{
+	return m_string.compare(str) >= 0;
+}
+
+bool GString::operator<(const GString& str) const
+{
+	return m_string.compare(str.m_string) < 0;
+}
+
+bool GString::operator<(const wchar_t* str) const
+{
+	return m_string.compare(str) < 0;
+}
+
+bool GString::operator<=(const GString& str) const
+{
+	return m_string.compare(str.m_string) <= 0;
+}
+
+bool GString::operator<=(const wchar_t* str) const
+{
+	return m_string.compare(str) <= 0;
 }
 
 const wchar_t* GString::data() const
@@ -187,6 +238,18 @@ bool GString::empty() const
 	return m_string.empty();
 }
 
+bool GString::isEmptyOrBlank() const
+{
+	if (empty())
+		return true;
+	for (auto elem: m_string)
+	{
+		if (!::isblank(elem))
+			return false;
+	}
+	return true;
+}
+
 GString::iterator GString::begin()
 {
 	return m_string.begin();
@@ -229,44 +292,32 @@ GString::const_reverse_iterator GString::rend() const
 
 std::string GString::toAnsi() const
 {
-	std::string str;
-	int len = WideCharToMultiByte(CP_ACP, 0, m_string.data(), (int)m_string.size(), 0, 0, 0, 0);
-	if (len < 0)
-		return str;
-	str.resize(len);
-	WideCharToMultiByte(CP_ACP, 0, m_string.data(), (int)m_string.size(), (char*)str.data(), (int)str.length(), 0, 0);
-	return std::move(str);
+	return ConvertEncoding(m_string, GEncoding::EncodingAnsi);
 }
 
 std::string GString::toUtf8() const
 {
-	std::string str;
-	int len = WideCharToMultiByte(CP_UTF8, 0, m_string.data(), (int)m_string.size(), 0, 0, 0, 0);
-	if (len < 0)
-		return str;
-	str.resize(len);
-	WideCharToMultiByte(CP_UTF8, 0, m_string.data(), (int)m_string.size(), (char*)str.data(), (int)str.length(), 0, 0);
-	return std::move(str);
+	return ConvertEncoding(m_string, GEncoding::EncodingUtf8);
 }
 
-std::wstring& GString::getStdString()
+const std::wstring& GString::toUnicode() const
 {
 	return m_string;
 }
 
-const std::wstring& GString::getStdString() const
+std::wstring& GString::toUnicode()
 {
 	return m_string;
 }
 
-int GString::compare(const GStringPiece& str, bool ignoreCase /*= false*/) const
+int GString::compare(const GString& str, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).compare(str, ignoreCase);
+	return CompareString(m_string.data(), m_string.data() + m_string.size(), str.data(), str.data() + str.size(), caseSentive);
 }
 
-bool GString::compareWith(const GStringPiece& str, bool ignoreCase /*= false*/) const
+bool GString::compareWith(const GString& str, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).compareWith(str, ignoreCase);
+	return CompareString(m_string.data(), m_string.data() + m_string.size(), str.data(), str.data() + str.size(), caseSentive) == 0;
 }
 
 wchar_t& GString::front()
@@ -274,7 +325,7 @@ wchar_t& GString::front()
 	return m_string.front();
 }
 
-wchar_t GString::front() const
+const wchar_t& GString::front() const
 {
 	return m_string.front();
 }
@@ -284,12 +335,12 @@ wchar_t& GString::back()
 	return m_string.back();
 }
 
-wchar_t GString::back() const
+const wchar_t& GString::back() const
 {
 	return m_string.back();
 }
 
-wchar_t GString::at(size_t index) const
+const wchar_t& GString::at(size_t index) const
 {
 	return m_string.at(index);
 }
@@ -299,7 +350,7 @@ wchar_t& GString::at(size_t index)
 	return m_string.at(index);
 }
 
-wchar_t GString::operator[](size_t index) const
+const wchar_t& GString::operator[](size_t index) const
 {
 	return m_string[index];
 }
@@ -322,46 +373,87 @@ GString& GString::push_back(wchar_t ch)
 	return *this;
 }
 
-GString& GString::append(const GStringPiece& str)
-{
-	size_t appendSize = str.size();
-	reserve(appendSize + this->size());
-	
-	for (auto itor = str.begin(); itor != str.end(); ++itor)
-		m_string.push_back(*itor);
-
-	return *this;
-}
-
-GString& GString::append(const GStringPiece& str, size_t count)
-{
-	return append(str.substr(0, count));
-}
-
 GString& GString::append(size_t count, wchar_t ch /*= 0*/)
 {
 	m_string.append(count, ch);
 	return *this;
 }
 
-GString& GString::assign(const GStringPiece& str)
+GString& GString::append(const GString& str)
 {
-	*this = str.toString();
+	m_string.append(str.m_string);
 	return *this;
 }
 
-GString& GString::assign(const GStringPiece& str, size_t count)
+GString& GString::append(const GString& str, size_t count)
 {
-	return assign(str.substr(0, count));
+	m_string.append(str.m_string, count);
+	return *this;
 }
 
-GString& GString::insert(size_t offset, const GStringPiece& str)
+GString& GString::append(const wchar_t* str)
 {
-	if (offset >= this->size())
-		offset = this->size() - 1;
-	m_string.insert(offset, 0, str.size());
-	for (size_t i = 0; i < str.size(); ++i)
-		m_string[i + offset] = str[i];
+	m_string.append(str);
+	return *this;
+}
+
+GString& GString::append(const wchar_t* str, size_t count)
+{
+	m_string.append(str, count);
+	return *this;
+}
+
+GString& GString::append(const_iterator _begin, const_iterator _end)
+{
+	m_string.append(_begin, _end);
+	return *this;
+}
+
+GString& GString::assign(const GString& str)
+{
+	m_string.assign(str.m_string);
+	return *this;
+}
+
+GString& GString::assign(const GString& str, size_t count)
+{
+	m_string.assign(str.m_string, count);
+	return *this;
+}
+
+GString& GString::assign(const wchar_t* str)
+{
+	m_string.assign(str);
+	return *this;
+}
+
+GString& GString::assign(const wchar_t* str, size_t count)
+{
+	m_string.assign(str, count);
+	return *this;
+}
+
+GString& GString::assign(const_iterator _begin, const_iterator _end)
+{
+	m_string.assign(_begin, _end);
+	return *this;
+}
+
+GString& GString::insert(size_t offset, const GString& str)
+{
+	m_string.insert(offset, str.m_string);
+	return *this;
+}
+
+GString& GString::insert(size_t offset, const wchar_t* str)
+{
+	m_string.insert(offset, str);
+	return *this;
+}
+
+GString& GString::insert(size_t offset, const wchar_t* str, size_t _size)
+{
+	m_string.insert(offset, str, _size);
 	return *this;
 }
 
@@ -393,187 +485,331 @@ GString& GString::removeRange(size_t _start, size_t _end)
 	return eraseRange(_start, _end);
 }
 
-GString& GString::replace(size_t offset, size_t count, const GStringPiece& replacement)
+GString& GString::replace(size_t offset, size_t count, const GString& replacement)
 {
-	if (offset >= size())
-		return *this;
-	size_t _size = replacement.size();
-	m_string.replace(offset, count, _size, 0);
-	for (size_t i = 0; i < _size; ++i)
-		m_string[i + offset] = replacement[i];
+	m_string.replace(offset, count, replacement.m_string);
 	return *this;
 }
 
-GString& GString::replaceAll(const GStringPiece& str, const GStringPiece& replacement)
+GString& GString::replace(size_t offset, size_t count, const wchar_t* replacement)
 {
-	size_t offset = find(str);
-	while (offset != npos)
+	m_string.replace(offset, count, replacement);
+	return *this;
+}
+
+GString& GString::replace(const_iterator _begin, const_iterator _end, const wchar_t* replacement)
+{
+	m_string.replace(_begin, _end, replacement);
+	return *this;
+}
+
+GString& GString::replace(const_iterator _begin, const_iterator _end, const GString& replacement)
+{
+	m_string.replace(_begin, _end, replacement.m_string);
+	return *this;
+}
+
+GString& GString::replaceAll(const GString& str, const GString& replacement)
+{
+	size_t findindex = 0;
+	while ((findindex = m_string.find(str.m_string, findindex)) != npos)
 	{
-		replace(offset, str.size(), replacement);
-		offset = find(str, offset + replacement.size());
+		m_string.replace(findindex, str.size(), replacement.m_string);
+		++findindex;
+	}
+	return *this;
+}
+
+GString& GString::replaceAll(const wchar_t* str, const wchar_t* replacement)
+{
+	size_t findindex = 0;
+	size_t len = wcslen(str);
+	while ((findindex = m_string.find(str, findindex)) != npos)
+	{
+		m_string.replace(findindex, len, replacement);
+		++findindex;
 	}
 	return *this;
 }
 
 GString& GString::replaceRegex(const GRegex& re, const GString& replacement)
 {
-	re.replace(*this, replacement);
+	return replaceRegex(re, replacement.data());
+}
+
+GString& GString::replaceRegex(const GRegex& re, const wchar_t* replacement)
+{
+	typedef std::pair<size_t, size_t> EraseRange;
+	typedef std::vector<EraseRange> EraseRangeList;
+	EraseRangeList list;
+	for (auto itor = re.begin(*this); itor != re.end(); ++itor)
+		list.push_back(EraseRange(itor->first - begin(), itor->length()));
+	for (size_t i = list.size(); i > 0; --i)
+	{
+		const EraseRange& range = list.at(i - 1);
+		m_string.replace(range.first, range.second, replacement);
+	}
 	return *this;
 }
 
 GString GString::substr(size_t offset, size_t count /*= npos*/) const
 {
-	return m_string.substr(offset, count);
+	GString tmp;
+	tmp.m_string = m_string.substr(offset, count);
+	return std::move(tmp);
 }
 
 GString GString::substrRange(size_t _start, size_t _end) const
 {
-	if (_end == npos)
-		return substr(_start);
 	return substr(_start, _end - _start);
 }
 
 GString GString::slice(size_t _start, size_t _end) const
 {
-	return substrRange(_start, _end);
+	return substr(_start, _end - _start);
+}
+
+GString GString::slice(size_t _start) const
+{
+	return substr(_start);
 }
 
 std::vector<GString> GString::split(const GString& str, size_t maxSize /*= npos*/) const
 {
-	std::vector<GString> strs;
-	size_t offset = m_string.find(str.m_string);
-	size_t preOffset = 0;
-	while (offset != npos && strs.size() < maxSize)
-	{
-		GString tmp = substrRange(preOffset, offset);
-		if (!tmp.empty())
-			strs.push_back(std::move(tmp));
-		preOffset = offset + str.size();
-		offset = m_string.find(str.m_string, preOffset);
-	}
-	if (strs.size() < maxSize)
-	{
-		GString tmp = substrRange(preOffset, offset);
-		if (!tmp.empty())
-			strs.push_back(std::move(tmp));
-	}
-	return std::move(strs);
+	return split(str.data(), maxSize);
 }
 
 std::vector<GString> GString::split(const wchar_t* str, size_t maxSize /*= npos*/) const
 {
-	size_t strLen = wcslen(str);
 	std::vector<GString> strs;
-	size_t offset = m_string.find(str);
-	size_t preOffset = 0;
-	while (offset != npos && strs.size() < maxSize)
+	if (empty())
+		return std::move(strs);
+
+	size_t len = wcslen(str);
+	size_t preindex = 0;
+	size_t findindex = 0;
+	while ((findindex = find(str, preindex)) != npos && strs.size() < maxSize)
 	{
-		GString tmp = substrRange(preOffset, offset);
-		if (!tmp.empty())
-			strs.push_back(std::move(tmp));
-		preOffset = offset + strLen;
-		offset = m_string.find(str, preOffset);
+		if (preindex == findindex)
+		{
+			preindex = findindex + len;
+			continue;
+		}
+		strs.push_back(slice(preindex, findindex));
+		preindex = findindex + len;
 	}
-	if (strs.size() < maxSize)
+	if (preindex < m_string.size())
 	{
-		GString tmp = substrRange(preOffset, offset);
-		if (!tmp.empty())
-			strs.push_back(std::move(tmp));
+		strs.push_back(slice(preindex));
 	}
 	return std::move(strs);
 }
 
 std::vector<GString> GString::splitRegex(const GRegex& re, size_t maxSize /*= npos*/) const
 {
-	std::vector<GString> strs;
-	auto strItor = begin();
-	for (auto itor = re.begin(*this); itor != re.end() && strs.size() < maxSize; ++itor)
+	return std::vector<GString>();
+}
+
+size_t GString::find(const GString& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
+{
+	return find(str.data(), offset, caseSentive);
+}
+
+size_t GString::find(const wchar_t* str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
+{
+	size_t len = wcslen(str);
+	size_t srclen = this->size();
+	if (srclen < len)
+		return npos;
+	for (size_t i = offset; i <= srclen - len; ++i)
 	{
-		GString str;
-		str.m_string = std::wstring(strItor, itor->first);
-		strItor = itor->second;
-		if(str.empty())
-			continue;
-		strs.push_back(std::move(str));
+		if (CompareString(
+			this->data() + i, this->data() + i + len - 1,
+			str, str + len - 1,
+			caseSentive) == 0)
+			return i;
 	}
-
-	return std::move(strs);
+	return -1;
 }
 
-size_t GString::find(const GStringPiece& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
+size_t GString::findFirst(const GString& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
 {
-	return findFirst(str, offset, caseSentive);
+	return find(str, offset, caseSentive);
 }
 
-size_t GString::findFirst(const GStringPiece& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
+size_t GString::findFirst(const wchar_t* str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).find(str, offset, caseSentive);
+	return find(str, offset, caseSentive);
 }
 
-size_t GString::findFirstNot(const GStringPiece& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
+size_t GString::findFirstNot(const GString& str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).findFirstNot(str, caseSentive);
+	return findFirstNot(str.data(), offset, caseSentive);
 }
 
-size_t GString::findLast(const GStringPiece& str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
+size_t GString::findFirstNot(const wchar_t* str, size_t offset /*= 0*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).findLast(str, offset, caseSentive);
+	size_t len = wcslen(str);
+	size_t srclen = this->size();
+	if (srclen < len)
+		return npos;
+	for (size_t i = offset; i <= srclen - len; ++i)
+	{
+		if (CompareString(
+			this->data() + i, this->data() + i + len - 1,
+			str, str + len - 1,
+			caseSentive) != 0)
+			return i;
+	}
+	return -1;
 }
 
-size_t GString::findLastNot(const GStringPiece& str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
+size_t GString::findLast(const GString& str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).findLastNot(str, offset, caseSentive);
+	return findLast(str.data(), offset, caseSentive);
 }
 
-bool GString::startsWith(const GStringPiece& str, bool ignoreCase /*= false*/) const
+size_t GString::findLast(const wchar_t* str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).startsWith(str, ignoreCase);
+	size_t len = wcslen(str);
+	size_t srclen = this->size();
+	if (srclen < len)
+		return npos;
+
+	if (offset >= srclen)
+		offset = srclen - len;
+	for (size_t i = offset; i != npos; --i)
+	{
+		if (CompareString(
+			this->data() + i, this->data() + i + len - 1,
+			str, str + len - 1,
+			caseSentive) == 0)
+			return i;
+	}
+	return -1;
 }
 
-bool GString::endsWith(const GStringPiece& str, bool ignoreCase /*= false*/) const
+size_t GString::findLastNot(const GString& str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
 {
-	return GStringPiece(m_string).endsWith(str, ignoreCase);
+	return findLastNot(str.data(), offset, caseSentive);
 }
 
-GString& GString::addStartsWith(const GStringPiece& str, bool ignoreCase /*= false*/)
+size_t GString::findLastNot(const wchar_t* str, size_t offset /*= npos*/, bool caseSentive /*= true*/) const
 {
-	if (!startsWith(str, ignoreCase))
-		str.insert(*this, 0);
+	size_t len = wcslen(str);
+	size_t srclen = this->size();
+	if (srclen < len)
+		return npos;
+
+	if (offset >= srclen)
+		offset = srclen - len;
+	for (size_t i = offset; i != npos; --i)
+	{
+		if (CompareString(
+			this->data() + i, this->data() + i + len - 1,
+			str, str + len - 1,
+			caseSentive) != 0)
+			return i;
+	}
+	return -1;
+}
+
+bool GString::startsWith(const GString& str, bool caseSentive /*= true*/) const
+{
+	return startsWith(str.data(), caseSentive);
+}
+
+bool GString::startsWith(const wchar_t* str, bool caseSentive /*= true*/) const
+{
+	size_t len = wcslen(str);
+	size_t srclen = m_string.size();
+	if (srclen < len)
+		return false;
+	return CompareString(m_string.data(), m_string.data() + srclen - 1, str, str + len - 1, caseSentive) == 0;
+}
+
+bool GString::endsWith(const GString& str, bool caseSentive /*= true*/) const
+{
+	return endsWith(str.data(), caseSentive);
+}
+
+bool GString::endsWith(const wchar_t* str, bool caseSentive /*= true*/) const
+{
+	size_t len = wcslen(str);
+	size_t srclen = m_string.size();
+	if (srclen < len)
+		return false;
+	return CompareString(m_string.data() + srclen - len, m_string.data() + srclen - 1, str, str + len - 1, caseSentive) == 0;
+}
+
+GString& GString::addStartsWith(const GString& str, bool caseSentive /*= true*/)
+{
+	if (!startsWith(str, caseSentive))
+		m_string.insert(0, str.m_string);
 	return *this;
 }
 
-GString& GString::addEndsWith(const GStringPiece& str, bool ignoreCase /*= false*/)
+GString& GString::addStartsWith(const wchar_t* str, bool caseSentive /*= true*/)
 {
-	if (!endsWith(str, ignoreCase))
-		this->append(str);
+	if (!startsWith(str, caseSentive))
+		m_string.insert(0, str);
 	return *this;
 }
 
-GString& GString::removeStartsWith(const GStringPiece& str, bool ignoreCase /*= false*/)
+GString& GString::addEndsWith(const GString& str, bool caseSentive /*= true*/)
 {
-	if (startsWith(str, ignoreCase))
+	if (!endsWith(str, caseSentive))
+		m_string.append(str.m_string);
+	return *this;
+}
+
+GString& GString::addEndsWith(const wchar_t* str, bool caseSentive /*= true*/)
+{
+	if (!endsWith(str, caseSentive))
+		m_string.append(str);
+	return *this;
+}
+
+GString& GString::removeStartsWith(const GString& str, bool caseSentive /*= true*/)
+{
+	if (startsWith(str, caseSentive))
 		m_string.erase(0, str.size());
 	return *this;
 }
 
-GString& GString::removeEndsWith(const GStringPiece& str, bool ignoreCase /*= false*/)
+GString& GString::removeStartsWith(const wchar_t* str, bool caseSentive /*= true*/)
 {
-	if (endsWith(str, ignoreCase))
+	if (startsWith(str, caseSentive))
+		m_string.erase(0, wcslen(str));
+	return *this;
+}
+
+GString& GString::removeEndsWith(const GString& str, bool caseSentive /*= true*/)
+{
+	if (endsWith(str, caseSentive))
 		m_string.erase(this->size() - str.size(), str.size());
+	return *this;
+}
+
+GString& GString::removeEndsWith(const wchar_t* str, bool caseSentive /*= true*/)
+{
+	size_t len = wcslen(str);
+	if (endsWith(str, caseSentive))
+		m_string.erase(this->size() - len, len);
 	return *this;
 }
 
 bool GString::endsWithSperator() const
 {
-	if (m_string.empty())
+	if (empty())
 		return false;
-	return m_string.back() == L'\\' || m_string.back() == L'/';
+	return m_string.back() == '/' || m_string.back() == '\\';
 }
 
 GString& GString::addEndsWithSperator()
 {
 	if (!endsWithSperator())
-		m_string.push_back(L'/');
+		m_string.push_back('\\');
 	return *this;
 }
 
@@ -588,57 +824,51 @@ bool GString::startsWithSperator() const
 {
 	if (empty())
 		return false;
-	return front() == '/' || front() == '\\';
+	return m_string.front() == '/' || m_string.front() == '\\';
 }
 
 GString& GString::addStartsWithSperator()
 {
 	if (!startsWithSperator())
-		m_string.insert(0, L"/");
+		m_string.insert(0, 1, '\\');
 	return *this;
 }
 
 GString& GString::removeStartsWithSperator()
 {
 	if (startsWithSperator())
-		m_string.erase(m_string.begin());
+		m_string.erase(0);
 	return *this;
 }
 
 GString& GString::toUpper()
 {
-	for (auto itor = begin(); itor != end(); ++itor)
-		*itor = (wchar_t)::toupper(*itor);
+	for (auto itor = m_string.begin(); itor != m_string.end(); ++itor)
+		*itor = ::toupper(*itor);
 	return *this;
 }
 
 GString& GString::toLower()
 {
-	for (auto itor = begin(); itor != end(); ++itor)
-		*itor = (wchar_t)::tolower(*itor);
+	for (auto itor = m_string.begin(); itor != m_string.end(); ++itor)
+		*itor = ::tolower(*itor);
 	return *this;
 }
 
 GString& GString::trimFront()
 {
-	for (size_t i = 0; i < m_string.size(); ++i)
-	{
-		if (!::isblank(m_string[i]))
-		{
-			if(i == 0)
-				break;
-			m_string = m_string.substr(i);
-			break;
-		}
-	}
+	size_t count = 0;
+	auto itor = m_string.begin();
+	for (; itor != m_string.end() && ::isblank(*itor); ++itor) {}
+	count = itor - m_string.begin();
+	if(count != 0)
+		m_string.erase(0, count);
 	return *this;
 }
 
 GString& GString::trimBack()
 {
-	if (empty())
-		return *this;
-	while (::isblank(m_string.back()))
+	while (!empty() && ::isblank(m_string.back()))
 		m_string.pop_back();
 	return *this;
 }
@@ -656,7 +886,19 @@ int GString::toInt() const
 
 __int64 GString::toInt64() const
 {
-	return ::_wtoi64(m_string.data());
+	return ::_wtoll(m_string.data());
+}
+
+int GString::toHex() const
+{
+	wchar_t* ptr;
+	return (int)wcstol(m_string.data(), &ptr, 16);
+}
+
+__int64 GString::toHex64() const
+{
+	wchar_t* ptr;
+	return (__int64)wcstoll(m_string.data(), &ptr, 16);
 }
 
 double GString::toDouble() const
@@ -664,8 +906,45 @@ double GString::toDouble() const
 	return ::_wtof(m_string.data());
 }
 
+size_t GString::hashCode() const
+{
+	return std::hash<std::wstring>()(m_string);
+}
+
+GString GString::clone() const
+{
+	return *this;
+}
+
+bool GString::operator==(const wchar_t* str) const
+{
+	return m_string == str;
+}
+
+bool GString::operator==(const GString& str) const
+{
+	return m_string == str.m_string;
+}
+
+const GString& GString::operator=(const char* str)
+{
+	return *this = FromEncoding(str);
+}
+
+const GString& GString::operator=(const wchar_t* str)
+{
+	m_string = str;
+	return *this;
+}
+
 const GString& GString::operator=(GString&& str)
 {
 	m_string = std::move(str.m_string);
+	return *this;
+}
+
+const GString& GString::operator=(const GString& str)
+{
+	m_string = str.m_string;
 	return *this;
 }

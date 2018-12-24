@@ -13,8 +13,14 @@ GRegex::GRegex(const wchar_t* re)
 {
 }
 
+GRegex::GRegex(const std::wstring& re)
+	: m_regex(re), m_matchFlag(MatchFlag::match_default)
+{
+
+}
+
 GRegex::GRegex(const GString& re)
-	: m_regex(re.getStdString()), m_matchFlag(MatchFlag::match_default)
+	: m_regex(re.data()), m_matchFlag(MatchFlag::match_default)
 {
 
 }
@@ -43,7 +49,7 @@ GRegex::MatchFlag GRegex::getMatchFlag() const
 
 bool GRegex::test(const GString& str) const
 {
-	return std::regex_match(str.getStdString(), m_regex, m_matchFlag);
+	return std::regex_match(str.data(), m_regex, m_matchFlag);
 }
 
 GString GRegex::search(const GString& str) const
@@ -52,7 +58,7 @@ GString GRegex::search(const GString& str) const
 	if(!std::regex_search(str.begin(), str.end(), result, m_regex, m_matchFlag))
 		return L"";
 
-	return result.begin()->str();
+	return result.begin()->str().data();
 }
 
 GRegex::MatchResults GRegex::match(const GString& str) const

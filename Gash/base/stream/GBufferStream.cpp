@@ -21,6 +21,11 @@ void GBufferStream::flush()
 	
 }
 
+size_t GBufferStream::readline(void* pBuffer, size_t bufsize)
+{
+	return static_cast<GBufferIO*>(getDevice().get())->readline(pBuffer, bufsize);
+}
+
 size_t GBufferStream::size() const
 {
 	return static_cast<GBufferIO*>(getDevice().get())->size();

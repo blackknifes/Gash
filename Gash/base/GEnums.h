@@ -28,13 +28,13 @@ public:
 
 	operator _enumTy() const
 	{
-		return m_value;
+		return (_enumTy)m_value;
 	}
 	operator unsigned int() const
 	{
 		return m_value;
 	}
-	operator unsigned long() const
+	explicit operator unsigned long() const
 	{
 		return m_value;
 	}

@@ -11,6 +11,7 @@
 #include "reflection/GUserType.h"
 #include "GMemoryBlockPool.h"
 #include "reflection/GReflectionObject.h"
+#include "GStringPiece.h"
 
 class GValue;
 

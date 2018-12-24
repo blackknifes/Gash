@@ -1,6 +1,7 @@
 #include "GShell.h"
 #include <ShlObj.h>
 #include "GStringPiece.h"
+#include <shellapi.h>
 
 #pragma comment(lib, "Shell32.lib")
 #pragma warning(disable: 4311)

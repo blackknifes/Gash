@@ -27,13 +27,13 @@ public:
 
 	template<typename _castTy>
 	GScopePointer(const GScopePointer<_castTy>& pData) 
-		: m_pData(pData.m_pData) 
+		: m_pData(static_cast<_Ty*>(pData.m_pData))
 	{ 
 		AddRef(); 
 	};
 	template<typename _castTy>
 	GScopePointer(GScopePointer<_castTy>&& pData)
-		:m_pData(pData.m_pData)
+		:m_pData(static_cast<_Ty*>(pData.m_pData))
 	{
 		pData.m_pData = nullptr;
 	}
@@ -55,7 +55,7 @@ public:
 	const GScopePointer& operator=(const GScopePointer<_castTy>& pData)
 	{
 		Release();
-		m_pData = pData.m_pData;
+		m_pData = static_cast<_Ty*>(pData.m_pData);
 		AddRef();
 		return *this;
 	}
@@ -64,7 +64,7 @@ public:
 	const GScopePointer& operator=(GScopePointer<_castTy>&& pData)
 	{
 		Release();
-		m_pData = pData.m_pData;
+		m_pData = static_cast<_Ty*>(pData.m_pData);
 		pData.m_pData = nullptr;
 		return *this;
 	}

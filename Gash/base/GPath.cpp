@@ -146,20 +146,19 @@ GString GPath::getBasename() const
 
 GString GPath::getFilename() const
 {
-	return m_strFilename;
+	return m_strFilename.toString();
 }
 
 GString GPath::getExtname() const
 {
-	return m_strExtname;
+	return m_strExtname.toString();
 }
 
 GPath& GPath::normalize()
 {
 	if (!isValid())
 		return *this;
-	GString tmp = std::move(m_strPath);
-	NormalizePath(tmp);
+	NormalizePath(m_strPath);
 	return *this;
 }
 
@@ -190,7 +189,7 @@ GString GPath::Resolve(const wchar_t* str, ...)
 
 GString GPath::Resolve(const char* str, ...)
 {
-	GString buf = GString::FromAnsi(str);
+	GString buf = GString::FromEncoding(str);
 	buf.reserve(MAX_PATH);
 	buf.addEndsWithSperator();
 	va_list ap;
@@ -199,7 +198,7 @@ GString GPath::Resolve(const char* str, ...)
 	{
 		if (IsPathSeperator(str[0]))
 			str = str + 1;
-		buf.append(GString::FromAnsi(str));
+		buf.append(GString::FromEncoding(str));
 	}
 	va_end(ap);
 

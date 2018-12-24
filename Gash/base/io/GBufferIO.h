@@ -19,18 +19,21 @@ public:
 	virtual bool isClosed() const override;
 	virtual int getErrorCode() const override;
 	virtual GString getErrorMessage() const override;
+	virtual size_t readline(void* pBuffer, size_t bufsize);
 
 	size_t size() const;
 	size_t capacity() const;
-	void reserve(size_t _size);
-	void resize(size_t _size, unsigned char val = 0);
+	void reserve(size_t _capacity);
 
+	void clear();
 	GDataArray readAll();
 private:
-	GObjectImplements(GBufferIO);
-	GObjectClass(GBufferIO);
-	std::vector<GDataArray> m_dataArrayList;
-	size_t m_dataSize;
+	GObjectClassPooled(GBufferIO);
+	struct Buffer
+	{
+		unsigned char buf[0x4000];
+	};
+	std::vector<Buffer*> m_bufferList;
 	size_t m_readOffset;
 	size_t m_writeOffset;
 };

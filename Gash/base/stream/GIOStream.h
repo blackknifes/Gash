@@ -14,7 +14,6 @@ public:
 	virtual void write(const void* pData, size_t _size) override;
 	virtual void flush() override;
 private:
-	GObjectImplements(GIOStream);
-	GObjectClass(GIOStream);
+	GObjectClassPooled(GIOStream);
 };
 #endif

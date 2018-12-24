@@ -11,6 +11,8 @@ public:
 	void lock() const;
 	void unlock() const;
 private:
+	GThreadLocker(GThreadLocker&&);
+	GThreadLocker(const GThreadLocker&);
 	CRITICAL_SECTION m_section;
 };
 

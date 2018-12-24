@@ -1,6 +1,7 @@
 #ifndef __GOBJECTPOOLED_H__
 #define __GOBJECTPOOLED_H__
 #include "GObject.h"
+#include "GAllocator.h"
 
 template<typename _Ty>
 class GObjectPooled: public virtual GObject
@@ -14,7 +15,8 @@ public:
 	template<typename... _argsTy>
 	static GScopePointer<_Ty> CreatePooled(_argsTy&&... args)
 	{
-		_Ty* pData = PopFromGlobalPool<_Ty>(std::move(args)...);
+		_Ty* pData = m_allocator.allocate();
+		m_allocator.construct(pData, args...);
 		((GObjectPooled*)pData)->m_bPooled = true;
 		return pData;
 	}
@@ -22,11 +24,12 @@ public:
 	virtual void destroy() override
 	{
 		if (m_bPooled)
-			PushToGlobalPool(this);
+			m_allocator.deallocate(this);
 		else
 			GObject::destroy();
 	}
 private:
 	bool m_bPooled;
+	GAllocator<_Ty> m_allocator;
 };
 #endif

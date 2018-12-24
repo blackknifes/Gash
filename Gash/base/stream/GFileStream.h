@@ -18,8 +18,7 @@ public:
 	virtual size_t read(void* pData, size_t _size) override;
 
 private:
-	GObjectImplements(GFileInputStream);
-	GObjectClass(GFileInputStream);
+	GObjectClassPooled(GFileInputStream);
 protected:
 	GFileInputStream() {};
 };
@@ -34,9 +33,11 @@ public:
 	virtual void write(const void* pData, size_t _size) override;
 	virtual void flush() override;
 
+
+	virtual void end() override;
+
 private:
-	GObjectImplements(GFileOutputStream);
-	GObjectClass(GFileOutputStream);
+	GObjectClassPooled(GFileOutputStream);
 
 protected:
 	GFileOutputStream() {};
@@ -58,7 +59,6 @@ public:
 		);
 	
 private:
-	GObjectImplements(GFileStream);
-	GObjectClass(GFileStream);
+	GObjectClassPooled(GFileStream);
 };
 #endif

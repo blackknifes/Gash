@@ -3,10 +3,7 @@
 
 void GInputStream::pipe(GOutputStreamPtr pOutputStream)
 {
-	unsigned char buf[4096] = {};
-	size_t readSize;
-	while ((readSize = read(buf, sizeof(buf))) != 0)
-		pOutputStream->write(buf, readSize);
+	read(pOutputStream);
 }
 
 GDataArray GInputStream::read(size_t _size)
@@ -15,6 +12,15 @@ GDataArray GInputStream::read(size_t _size)
 	_size = read(dataArray.data(), _size);
 	dataArray.resize(_size);
 	return std::move(dataArray);
+}
+
+void GInputStream::read(GOutputStreamPtr pOutputStream)
+{
+	unsigned char buf[4096] = {};
+	size_t readSize;
+	while ((readSize = read(buf, sizeof(buf))) != 0)
+		pOutputStream->write(buf, readSize);
+	pOutputStream->end();
 }
 
 GDataArray GInputStream::readAll()
@@ -127,6 +133,18 @@ const GOutputStream& GOutputStream::operator<<(const std::wstring& val)
 const GOutputStream& GOutputStream::operator<<(const GDataArray& val)
 {
 	write(val.data(), val.size());
+	return *this;
+}
+
+const GOutputStream& GOutputStream::operator<<(const char* val)
+{
+	write(val, strlen(val));
+	return *this;
+}
+
+const GOutputStream& GOutputStream::operator<<(const wchar_t* val)
+{
+	write(val, wcslen(val) << 1);
 	return *this;
 }
 
