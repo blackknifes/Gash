@@ -2,7 +2,7 @@
 #include "GMemoryPool.h"
 #include <iostream>
 #include <assert.h>
-#include "GMemoryBlockPool.h"
+#include "GAllocator.h"
 
 #define TODO(msg) 
 
@@ -14,7 +14,7 @@ static void AssignGValueField(GValue* pVal, _Ty** field, GType* type, const _Ty&
 	else
 	{
 		pVal->reset();
-		*field = PopFromGlobalPool<_Ty>(val);
+		*field = GNewObject<_Ty>(val);
 		*type = targetType;
 	}
 }
@@ -27,7 +27,7 @@ static void AssignGValueField(GValue* pVal, _Ty** field, GType* type, _Ty&& val,
 	else
 	{
 		pVal->reset();
-		*field = PopFromGlobalPool<_Ty>(std::move(val));
+		*field = GNewObject<_Ty>(std::move(val));
 		*type = targetType;
 	}
 }
@@ -57,10 +57,9 @@ GUserData::GUserData(const GUserData& obj)
 }
 
 GUserData::GUserData(GUserData&& obj)
-	:m_pObject(obj.m_pObject), m_userType(obj.m_userType)
+	:m_pUserData(obj.m_pUserData), m_userType(obj.m_userType)
 {
-	obj.m_pObject.data = nullptr;
-	obj.m_pObject.size = 0;
+	obj.m_pUserData = nullptr;
 }
 
 GUserData::GUserData(const void* pObject, GUserTypePtr userType)
@@ -73,11 +72,10 @@ GUserData::GUserData(const void* pObject, GUserTypePtr userType)
 const GUserData& GUserData::operator=(GUserData&& obj)
 {
 	destruct();
-	m_pObject = obj.m_pObject;
+	m_pUserData = obj.m_pUserData;
 	m_userType = obj.m_userType;
 	
-	obj.m_pObject.data = nullptr;
-	obj.m_pObject.size = 0;
+	obj.m_pUserData = nullptr;
 	return *this;
 }
 
@@ -98,7 +96,7 @@ bool GUserData::operator==(const GUserData& obj) const
 
 bool GUserData::isNull() const
 {
-	return m_pObject.data == nullptr;
+	return m_pUserData == nullptr;
 }
 
 bool GUserData::isValid() const
@@ -108,7 +106,7 @@ bool GUserData::isValid() const
 
 void* GUserData::get() const
 {
-	return m_pObject.data;
+	return m_pUserData;
 }
 
 void GUserData::construct()
@@ -116,15 +114,15 @@ void GUserData::construct()
 	if (!isValid())
 		return;
 	if(!isNull())
-		m_userType->destruct(m_pObject.data);
-	m_userType->construct(m_pObject.data);
+		m_userType->destruct(m_pUserData);
+	m_userType->construct(m_pUserData);
 }
 
 void GUserData::destruct()
 {
 	if (!isValid() || isNull())
 		return;
-	m_userType->destruct(m_pObject.data);
+	m_userType->destruct(m_pUserData);
 }
 
 GUserData GUserData::clone() const
@@ -132,8 +130,8 @@ GUserData GUserData::clone() const
 	if (!isValid() || isNull() || !m_userType->canClone())
 		return GUserData();
 	GUserData obj;
-	obj.m_pObject = PopBlockFromPool(size());
-	m_userType->clone(obj.m_pObject.data, m_pObject.data);
+	obj.m_pUserData = GAllocateFromPool(size());
+	m_userType->clone(obj.m_pUserData, m_pUserData);
 	return std::move(obj);
 }
 
@@ -143,8 +141,8 @@ GUserData GUserData::move() const
 		return GUserData();
 
 	GUserData obj;
-	obj.m_pObject = PopBlockFromPool(size());
-	m_userType->move(obj.m_pObject.data, m_pObject.data);
+	obj.m_pUserData = GAllocateFromPool(size());
+	m_userType->move(obj.m_pUserData, m_pUserData);
 	return std::move(obj);
 }
 
@@ -154,7 +152,7 @@ bool GUserData::compare(const GUserData& obj) const
 		return false;
 	if (!isValid())
 		return true;
-	return m_userType->compare(m_pObject.data, obj.m_pObject.data);
+	return m_userType->compare(m_pUserData, obj.m_pUserData);
 }
 
 size_t GUserData::size() const
@@ -172,8 +170,8 @@ void GUserData::init(const void* pObject)
 {
 	if (isValid() && m_userType->canClone())
 	{
-		m_pObject = PopBlockFromPool(size());
-		m_userType->clone(m_pObject.data, pObject);
+		m_pUserData = GAllocateFromPool(size());
+		m_userType->clone(m_pUserData, pObject);
 	}
 }
 
@@ -409,6 +407,11 @@ GValue GValue::fromUserData(const void* userdata, GUserTypePtr userType)
 	return GValue(userdata, userType);
 }
 
+GValue GValue::fromObject(GReflectionObjectPtr pObject)
+{
+	return GValue(pObject);
+}
+
 GValue GValue::fromVector(const GValueVector& vec)
 {
 	return GValue(vec);
@@ -512,13 +515,13 @@ GValue::GValue(unsigned __int64 val)
 }
 
 GValue::GValue(const GString& str)
-	: m_strValue(PopFromGlobalPool<GString>(str)), m_type(GType::TypeString)
+	: m_strValue(GNewObject<GString>(str)), m_type(GType::TypeString)
 {
 
 }
 
 GValue::GValue(GString&& str)
-	: m_strValue(PopFromGlobalPool<GString>(std::move(str))), m_type(GType::TypeString)
+	: m_strValue(GNewObject<GString>(std::move(str))), m_type(GType::TypeString)
 {
 
 }
@@ -530,7 +533,7 @@ GValue::GValue(const GUserData& userdata)
 	if (userdata.isValid())
 	{
 		m_type = GType::TypeUserData;
-		m_pUserData = PopFromGlobalPool<GUserData>(userdata);
+		m_pUserData = GNewObject<GUserData>(userdata);
 	}
 }
 
@@ -540,7 +543,7 @@ GValue::GValue(GUserData&& userdata)
 	if (userdata.isValid())
 	{
 		m_type = GType::TypeUserData;
-		m_pUserData = PopFromGlobalPool<GUserData>(std::move(userdata));
+		m_pUserData = GNewObject<GUserData>(std::move(userdata));
 	}
 }
 
@@ -551,7 +554,7 @@ GValue::GValue(const void* pData, const GUID& typeId)
 	if (userdata.isValid())
 	{
 		m_type = GType::TypeUserData;
-		m_pUserData = PopFromGlobalPool<GUserData>(std::move(userdata));
+		m_pUserData = GNewObject<GUserData>(std::move(userdata));
 	}
 }
 
@@ -563,7 +566,7 @@ GValue::GValue(const void* pData, const char* typeName)
 	if (userdata.isValid())
 	{
 		m_type = GType::TypeUserData;
-		m_pUserData = PopFromGlobalPool<GUserData>(std::move(userdata));
+		m_pUserData = GNewObject<GUserData>(std::move(userdata));
 	}
 }
 
@@ -574,7 +577,7 @@ GValue::GValue(const void* pData, GUserTypePtr userType)
 	if (userdata.isValid())
 	{
 		m_type = GType::TypeUserData;
-		m_pUserData = PopFromGlobalPool<GUserData>(std::move(userdata));
+		m_pUserData = GNewObject<GUserData>(std::move(userdata));
 	}
 }
 
@@ -638,7 +641,7 @@ void GValue::reset()
 	switch (m_type)
 	{
 	case GType::TypeString:
-		PushToGlobalPool(m_strValue);
+		GDestroyObject(m_strValue);
 		break;
 	case GType::TypeObject:
 		if(m_pObject)
@@ -656,7 +659,7 @@ void GValue::reset()
 	case GType::TypeUserData:
 	{
 		m_pUserData->destruct();
-		PushToGlobalPool(m_pUserData);
+		GDestroyObject(m_pUserData);
 	}
 	break;
 	default:
@@ -767,7 +770,7 @@ void GValue::setUserData(const GUserData& object)
 	if (!object.isValid())
 		return;
 	reset();
-	m_pUserData = PopFromGlobalPool<GUserData>(object);
+	m_pUserData = GNewObject<GUserData>(object);
 	m_type = GType::TypeUserData;
 }
 
@@ -776,7 +779,7 @@ void GValue::setUserData(GUserData&& object)
 	if (!object.isValid())
 		return;
 	reset();
-	m_pUserData = PopFromGlobalPool<GUserData>(std::move(object));
+	m_pUserData = GNewObject<GUserData>(std::move(object));
 	m_type = GType::TypeUserData;
 }
 
@@ -1580,7 +1583,7 @@ void GValue::assign(const GStringPiece& str)
 	else
 	{
 		reset();
-		m_strValue = PopFromGlobalPool<GString>(str.toString());
+		m_strValue = GNewObject<GString>(str.toString());
 		m_type = GType::TypeString;
 	}
 }

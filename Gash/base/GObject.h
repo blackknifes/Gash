@@ -27,7 +27,7 @@ public: \
 GObjectImplementsBase(_Class) \
 public: \
 	template<typename... _argsTy> \
-	static GScopePointer<_Class> New(_argsTy... args) \
+	static GScopePointer<_Class> CreatePooled(_argsTy... args) \
 	{ \
 		return GNewObject<_Class>(args...); \
 	} \

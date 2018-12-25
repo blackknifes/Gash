@@ -1,41 +1,43 @@
-#ifndef __GIODEVICE_H__
-#define __GIODEVICE_H__
+#ifndef __GDEVICE_H__
+#define __GDEVICE_H__
 #include "../GObject.h"
-#include "../GString.h"
-#include "../GDataArray.h"
-#include <io.h>
+#include <functional>
 
 GREFPTR_DEF(GIODevice);
 
 class GIODevice: public virtual GObject
 {
 public:
-	enum SeekType
-	{
-		SeekCur,
-		SeekBegin,
-		SeekEnd
-	};
+	typedef std::function<void(size_t)> WriteCallback;
+	typedef std::function<void(const void*, size_t)> ReadCallback;
 
-	virtual size_t read(void* pData, size_t bytes) = 0;
-	virtual size_t write(const void* pData, size_t bytes) = 0;
-	GDataArray read(size_t bytes);
-	size_t write(const GDataArray& pBuffer);
-	virtual GDataArray readAll();
+	GIODevice();
 
-	virtual void flush() = 0;
-	virtual __int64 seekRead(__int64 offset, SeekType pos = SeekCur) = 0;
-	virtual __int64 seekWrite(__int64 offset, SeekType pos = SeekCur) = 0;
-	virtual __int64 tellRead() const = 0;
-	virtual __int64 tellWrite() const = 0;
-
-	virtual void resetRead();
-	virtual void resetWrite();
-	virtual void reset();
+	//打开设备
+	virtual bool open() = 0;
+	//关闭设备
 	virtual void close() = 0;
+	//设备是否关闭
 	virtual bool isClosed() const = 0;
+	//写出数据到设备
+	virtual bool write(const void* pData, size_t size, const WriteCallback& callback) = 0;
+	//从设备读入数据
+	virtual bool read(size_t size, const ReadCallback& callback) = 0;
+	//写出数据到设备
+	virtual size_t writeSync(const void* pData, size_t size) = 0;
+	//从设备读入数据
+	virtual size_t readSync(void* pData, size_t size) = 0;
 
-	virtual int getErrorCode() const = 0;
-	virtual GString getErrorMessage() const = 0;
+	//刷写数据到设备
+	virtual void flush() = 0;
+	virtual void* getNativeHandle() const = 0;
+
+	//得到错误代码
+	int getErrorCode() const;
+	std::string getErrorMessage() const;
+protected:
+	void setErrorCode(int errCode);
+private:
+	int m_iErrorCode;
 };
 #endif

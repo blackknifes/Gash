@@ -9,7 +9,7 @@
 
 GREFPTR_DEF(GClass);
 
-class GClass: public GObject
+class GClass: public virtual GObject
 {
 public:
 	typedef std::unordered_map<std::string, GFunctionPtr> FunctionMap;

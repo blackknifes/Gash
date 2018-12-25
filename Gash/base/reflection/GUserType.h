@@ -21,7 +21,7 @@ struct GUserTypeGetGuid
 	}
 };
 
-class GUserType: public GObject
+class GUserType: public virtual GObject
 {
 public:
 	typedef void(*Constructor)(void* pData);

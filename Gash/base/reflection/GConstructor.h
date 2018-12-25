@@ -6,7 +6,7 @@
 
 GREFPTR_DEF(GConstructor);
 
-class GConstructor: public GObject
+class GConstructor: public virtual GObject
 {
 public:
 	template<typename _Ty, typename... _argsTy>

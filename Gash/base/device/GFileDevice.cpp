@@ -1,10 +1,13 @@
 #include "GFileDevice.h"
-#include "../async/fileio/GAsyncIO.h"
+#include "GAsyncIO.h"
 
+GFileDevicePtr GFileDevice::Create(const GString& path, Operations op /*= FileCreateOnNotExist*/, Mode mode /*= ModeReadWrite*/, ShareModes share /*= ShareNone*/)
+{
+	return GFileDevice::CreatePooled(path, op, mode, share);
+}
 
-
-GFileDevice::GFileDevice(const GString& path, Operations op /*= CreateOnNotExist*/, Mode mode /*= ModeReadWrite*/, ShareMode share /*= ShareNone*/, Attributes attributes /*= Normal*/)
-	:m_hFile(nullptr), m_path(path), m_operations(op), m_mode(mode), m_shareMode(share), m_attributes(attributes)
+GFileDevice::GFileDevice(const GString& path, Operations op /*= CreateOnNotExist*/, Mode mode /*= ModeReadWrite*/, ShareModes share /*= ShareNone*/)
+	:m_hFile(nullptr), m_path(path), m_operations(op), m_mode(mode), m_shareMode(share)
 {
 
 }
@@ -19,15 +22,17 @@ bool GFileDevice::isExists() const
 	return GetFileAttributesW(m_path.data()) != INVALID_FILE_ATTRIBUTES;
 }
 
-bool GFileDevice::open(bool async /*= false*/)
+bool GFileDevice::open()
 {
-	if (async)
-		m_attributes |= FILE_FLAG_OVERLAPPED;
+	return open(FILE_ATTRIBUTE_NORMAL);
+}
 
-	if (m_operations == CreateOnNotExist && isExists())
-		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, OPEN_EXISTING, m_attributes, nullptr);
+bool GFileDevice::open(DWORD attributes)
+{
+	if (m_operations == FileCreateOnNotExist && isExists())
+		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, OPEN_EXISTING, attributes | FILE_FLAG_OVERLAPPED, nullptr);
 	else
-		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, m_operations, m_attributes, nullptr);
+		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, m_operations, attributes | FILE_FLAG_OVERLAPPED, nullptr);
 	if (m_hFile == INVALID_HANDLE_VALUE)
 		m_hFile = nullptr;
 	return m_hFile != nullptr;
@@ -47,90 +52,10 @@ bool GFileDevice::isClosed() const
 	return m_hFile == nullptr;
 }
 
-GDevice::IOResult GFileDevice::write(const void* pData, size_t size)
-{
-	if (isClosed())
-		return GDevice::IO_NotOpen;
-	DWORD unused;
-	if (isAsync())
-	{
-		GAsyncIO* pIO = GNewIO();
-		pIO->ioType = GAsyncIO::IOWrite;
-		if (WriteFile(m_hFile, pData, size, &unused, &pIO->overlapped) == FALSE)
-		{
-			DWORD errCode;
-			switch (errCode = GetLastError())
-			{
-			case ERROR_IO_PENDING:
-				return GDevice::IO_Write_Pending;
-			default:
-				break;
-			}
-			setErrorCode(errCode);
-			return GDevice::IO_Internal_Error;
-		}
-		return GDevice::IO_Success;
-	}
-
-	if (WriteFile(m_hFile, pData, size, &unused, nullptr) == FALSE)
-	{
-		setErrorCode(GetLastError());
-		return GDevice::IO_Internal_Error;
-	}
-
-	return GDevice::IO_Success;
-}
-
-GDevice::IOResult GFileDevice::read(void* pData, size_t size, size_t* readsize /*= nullptr*/)
-{
-	if (isClosed())
-		return GDevice::IO_NotOpen;
-	DWORD dwReadSize;
-	if (isAsync())
-	{
-		GAsyncIO* pIO = GNewIO();
-		pIO->ioType = GAsyncIO::IOWrite;
-		if (ReadFile(m_hFile, pData, size, &dwReadSize, &pIO->overlapped) == FALSE)
-		{
-			DWORD errCode;
-			switch (errCode = GetLastError())
-			{
-			case ERROR_IO_PENDING:
-				return GDevice::IO_Write_Pending;
-			default:
-				break;
-			}
-			setErrorCode(errCode);
-			return GDevice::IO_Internal_Error;
-		}
-		if (readsize)
-			*readsize = dwReadSize;
-		return GDevice::IO_Success;
-	}
-
-	if (ReadFile(m_hFile, pData, size, &dwReadSize, nullptr) == FALSE)
-	{
-		setErrorCode(GetLastError());
-		return GDevice::IO_Internal_Error;
-	}
-
-	if (readsize)
-		*readsize = dwReadSize;
-
-	return GDevice::IO_Success;
-}
-
 void GFileDevice::flush()
 {
 	if (FlushFileBuffers(m_hFile) == FALSE)
 		setErrorCode(GetLastError());
-}
-
-bool GFileDevice::isAsync() const
-{
-	if (isClosed())
-		return false;
-	return (m_attributes & FILE_FLAG_OVERLAPPED) != 0;
 }
 
 void* GFileDevice::getNativeHandle() const
@@ -138,9 +63,14 @@ void* GFileDevice::getNativeHandle() const
 	return (void*)m_hFile;
 }
 
-GFile GFileDevice::getFile() const
+size_t GFileDevice::getSize() const
 {
-	return GFile(m_path);
+	if (isClosed())
+		return 0;
+	LARGE_INTEGER len;
+	if (GetFileSizeEx(m_hFile, &len) == FALSE)
+		return 0;
+	return len.QuadPart;
 }
 
 const GString& GFileDevice::getPath() const
@@ -156,4 +86,72 @@ bool GFileDevice::canRead() const
 bool GFileDevice::canWrite() const
 {
 	return (m_mode & ModeWrite) != 0;
+}
+
+GFileDevice::Stats GFileDevice::getStats() const
+{
+	return Stats();
+}
+
+size_t GFileDevice::writeSync(const void* pData, size_t size)
+{
+	OVERLAPPED overlapped;
+	memset(&overlapped, 0, sizeof(overlapped));
+	if (WriteFile(m_hFile, pData, size, nullptr, &overlapped) == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
+		return -1;
+
+	DWORD writeSize;
+	if (GetOverlappedResult(m_hFile, &overlapped, &writeSize, TRUE) == FALSE)
+		return -1;
+	return writeSize;
+}
+
+size_t GFileDevice::readSync(void* pData, size_t size)
+{
+	DWORD writeSize = 0;
+	if (ReadFile(m_hFile, pData, size, &writeSize, nullptr) == FALSE)
+		return -1;
+	return writeSize;
+}
+
+bool GFileDevice::write(const void* pData, size_t size, const WriteCallback& callback)
+{
+	GAsyncIOPtr pIO = GAsyncIO::CreateIO(this, GAsyncIO::IO_Write, 
+		std::bind(&GFileDevice::OnWrite, this, callback, std::placeholders::_1));
+
+	pIO->AddRef();
+	return WriteFile(m_hFile, pData, size, nullptr, pIO->getOverlapped()) == TRUE || WSAGetLastError() == ERROR_IO_PENDING;
+}
+
+bool GFileDevice::read(size_t size, const ReadCallback& callback)
+{
+	GAsyncIOPtr pIO = GAsyncIO::CreateIO(this, GAsyncIO::IO_Read,
+		std::bind(&GFileDevice::OnRead, this, callback, std::placeholders::_1));
+	pIO->allocBuffer(size);
+	pIO->AddRef();
+	return ReadFile(m_hFile, pIO->getBufferData(), size, nullptr, pIO->getOverlapped()) == TRUE || WSAGetLastError() == ERROR_IO_PENDING;
+}
+
+GDataArray GFileDevice::readAllSync()
+{
+	if (m_hFile == nullptr)
+		return GDataArray();
+	DWORD len;
+	GetFileSize(m_hFile, &len);
+	GDataArray dataArray;
+	dataArray.resize(len);
+	readSync(dataArray.data(), dataArray.size());
+	return std::move(dataArray);
+}
+
+void GFileDevice::OnRead(const ReadCallback& callback, GAsyncIOPtr pIO)
+{
+	if(callback)
+		callback(pIO->getBufferData(), pIO->getSize());
+}
+
+void GFileDevice::OnWrite(const WriteCallback& callback, GAsyncIOPtr pIO)
+{
+	if (callback)
+		callback(pIO->getSize());
 }

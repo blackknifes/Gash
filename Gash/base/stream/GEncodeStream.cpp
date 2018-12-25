@@ -9,11 +9,11 @@ GEncodeStream::GEncodeStream(Type type, GOutputStreamPtr pOut)
 	switch (m_type)
 	{
 	case GEncodeStream::Md5:
-		m_pContext = PopFromGlobalPool<MD5_CONTEXT>();
+		m_pContext = GNewObject<MD5_CONTEXT>();
 		MD5Init((MD5_CONTEXT*)m_pContext);
 		break;
 	case GEncodeStream::Base64:
-		m_pContext = PopFromGlobalPool<base64_state>();
+		m_pContext = GNewObject<base64_state>();
 		base64_stream_encode_init((base64_state*)m_pContext, 0);
 		break;
 	default:

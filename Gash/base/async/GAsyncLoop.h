@@ -6,7 +6,7 @@
 
 GREFPTR_DEF(GAsyncIdle);
 
-class GAsyncIdle: public GObject
+class GAsyncIdle: public virtual GObject
 {
 public:
 	void addThis();

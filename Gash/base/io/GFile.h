@@ -1,17 +1,18 @@
 #ifndef __GFILE_H__
 #define __GFILE_H__
 #include "../GPath.h"
-#include "GFileIO.h"
 #include "../GShell.h"
+#include "../GDataArray.h"
+#include "../device/GFileDevice.h"
 
 class GFile
 {
 public:
-	using Attributes = GFileIO::Attributes;
-	using Attribute = GFileIO::Attribute;
-	using Mode = GFileIO::Mode;
-	using ShareMode = GFileIO::ShareMode;
-	using ShareModes = GFileIO::ShareModes;
+	using Attributes = GFileDevice::Attributes;
+	using Attribute = GFileDevice::Attribute;
+	using Mode = GFileDevice::Mode;
+	using ShareMode = GFileDevice::ShareMode;
+	using ShareModes = GFileDevice::ShareModes;
 	using DirType = GShell::DirectoryType;
 
 	static GFile GetDir(DirType type);
@@ -33,8 +34,8 @@ public:
 /*	GString getRelativePath(const GPath& path) const;*/
 
 	bool isValid() const;
-	GFileIOPtr open(Mode mode) const;
-	GFileIOPtr openShare(Mode mode, ShareModes shareMode) const;
+	GFileDevicePtr open(Mode mode) const;
+	GFileDevicePtr openShare(Mode mode, ShareModes shareMode) const;
 
 	bool create(const GString& newPath);
 	bool createTemporary(const GString& newPath);

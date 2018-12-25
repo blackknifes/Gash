@@ -8,6 +8,7 @@ class GWin32SystemServiceManager: public GSystemServiceManager
 {
 public:
 	static GWin32SystemServiceManagerPtr Create();
+	GWin32SystemServiceManager();
 
 
 	virtual GServicePtr openService(const GString& name) override;
@@ -15,7 +16,6 @@ public:
 	virtual void uninstallService(GServicePtr pService) override;
 private:
 	GObjectClassPooled(GWin32SystemServiceManager);
-	GWin32SystemServiceManager();
 	~GWin32SystemServiceManager();
 
 	SC_HANDLE m_hSCManager;

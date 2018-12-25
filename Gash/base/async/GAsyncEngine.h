@@ -1,24 +1,24 @@
 #ifndef __GASYNCENGINE_H__
 #define __GASYNCENGINE_H__
 #include <Windows.h>
-#include "fileio/GAsyncIO.h"
-#include "fileio/GAsyncDevice.h"
 #include "../GObjectPool.h"
+#include "../io/GIODevice.h"
+#include "../device/GAsyncIO.h"
 
 GREFPTR_DEF(GAsyncEngine);
 
-class GAsyncEngine: public GObject
+class GAsyncEngine: public virtual GObject
 {
 public:
 	GAsyncEngine(DWORD numThread = 0);
 	~GAsyncEngine();
 
 	bool isValid() const;
-	bool addDevice(GAsyncDevicePtr pDevice);
-	bool getIOTask(GAsyncDevice** pDevice, GAsyncIO** pIO, DWORD overtime = INFINITE);
-	size_t getIOTaskList(GAsyncDevice** pDeviceList, GAsyncIO** pTaskList, size_t size, DWORD overtime = INFINITE);
+	bool addDevice(GIODevicePtr pDevice);
+	bool getIOTask(GIODevice** pDevice, GAsyncIO** pIO, DWORD overtime = INFINITE);
+	size_t getIOTaskList(GIODevice** pDeviceList, GAsyncIO** pTaskList, size_t size, DWORD overtime = INFINITE);
 
-	void doAsyncIO(GAsyncDevicePtr pDevice, GAsyncIO* pIO);
+	void doAsyncIO(GIODevicePtr pDevice, GAsyncIO* pIO);
 
 	DWORD getMaxThreadCount() const;
 

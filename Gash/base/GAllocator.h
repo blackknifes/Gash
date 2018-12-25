@@ -17,7 +17,7 @@ _Ty* GAllocateObject()
 template<typename _Ty, typename... _argsTy>
 _Ty* GNewObject(_argsTy&&... args)
 {
-	_Ty* pData = GAllocateFromPool(sizeof(_Ty));
+	_Ty* pData = (_Ty*)GAllocateFromPool(sizeof(_Ty));
 	new (pData) _Ty(std::move(args)...);
 	return pData;
 }

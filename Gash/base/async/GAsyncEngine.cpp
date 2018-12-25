@@ -1,6 +1,4 @@
 #include "GAsyncEngine.h"
-#include "fileio/GAsyncDevice.h"
-#include "fileio/GAsyncTCPSocket.h"
 #include <MSWSock.h>
 
 #define ASYNC_BUFFER_SIZE 0x4000
@@ -39,31 +37,28 @@ bool GAsyncEngine::isValid() const
 	return m_hIOCP != nullptr;
 }
 
-bool GAsyncEngine::addDevice(GAsyncDevicePtr pDevice)
+bool GAsyncEngine::addDevice(GIODevicePtr pDevice)
 {
 	return CreateIoCompletionPort((HANDLE)pDevice->getNativeHandle(), m_hIOCP, (ULONG_PTR)pDevice.get(), 0) != NULL;
 }
 
-bool GAsyncEngine::getIOTask(GAsyncDevice** pDevice, GAsyncIO** pIO, DWORD overtime /*= INFINITE*/)
+bool GAsyncEngine::getIOTask(GIODevice** pDevice, GAsyncIO** pIO, DWORD overtime /*= INFINITE*/)
 {
 	DWORD dwTransferSize;
 	ULONG_PTR key;
 	LPOVERLAPPED pOverlapped;
 	if (GetQueuedCompletionStatus(m_hIOCP, &dwTransferSize, &key, &pOverlapped, overtime) == FALSE)
 		return false;
-	GAsyncIO* pAsyncIO = CONTAINING_RECORD(pOverlapped, GAsyncIO, overlapped);
-	pAsyncIO->dwTransferSize = dwTransferSize;
-	*pDevice = (GAsyncDevice*)key;
-	*pIO = pAsyncIO;
+	GAsyncIO::OnComplete(pOverlapped, dwTransferSize, key);
 
 	return true;
 }
 
-size_t GAsyncEngine::getIOTaskList(GAsyncDevice** pDeviceList, GAsyncIO** pTaskList, size_t size, DWORD overtime /*= INFINITE*/)
+size_t GAsyncEngine::getIOTaskList(GIODevice** pDeviceList, GAsyncIO** pTaskList, size_t size, DWORD overtime /*= INFINITE*/)
 {
 	if (g_GetQueuedCompletionStatusEx == nullptr)
 	{
-		GAsyncDevice* pDevice = nullptr;
+		GIODevice* pDevice = nullptr;
 		GAsyncIO* pIO;
 		if (!getIOTask(&pDevice, &pIO, overtime))
 			return 0;
@@ -79,49 +74,13 @@ size_t GAsyncEngine::getIOTaskList(GAsyncDevice** pDeviceList, GAsyncIO** pTaskL
 		return 0;
 	size = (size_t)sizeOfEntry;
 	for (size_t i = 0; i < size; ++i)
-	{
-		pTaskList[i] = CONTAINING_RECORD(entries[i].lpOverlapped, GAsyncIO, overlapped);
-		pDeviceList[i] = (GAsyncDevice*)entries[i].lpCompletionKey;
-		pTaskList[i]->dwTransferSize = entries[i].dwNumberOfBytesTransferred;
-	}
+		GAsyncIO::OnComplete(entries[i].lpOverlapped, entries[i].dwNumberOfBytesTransferred, entries[i].lpCompletionKey);
 	return size;
 }
 
-void GAsyncEngine::doAsyncIO(GAsyncDevicePtr pDevice, GAsyncIO* pIO)
+void GAsyncEngine::doAsyncIO(GIODevicePtr pDevice, GAsyncIO* pIO)
 {
-	switch (pIO->ioType)
-	{
-	case GAsyncIO::IORead:
-		pDevice->onRead(pIO->buffer, pIO->dwTransferSize);
-		if (pIO->readCallback != nullptr)
-			pIO->readCallback(pDevice, pIO->buffer, pIO->dwTransferSize);
-		break;
-	case GAsyncIO::IOWrite:
-		pDevice->onWrite(pIO->dwTransferSize);
-		if (pIO->writeCallback != nullptr)
-			pIO->writeCallback(pDevice);
-		break;
-	case GAsyncIO::NetConnect:
-	{
-		GAsyncTCPSocketPtr tcp = pDevice;
-		setsockopt((SOCKET)tcp->getNativeHandle(), SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, nullptr, 0);
-		tcp->onConnect();
-		if (pIO->openCallback)
-			pIO->openCallback(pDevice);
-	}
-		break;
-	case GAsyncIO::NetDisconnect:
-	{
-		GAsyncTCPSocketPtr tcp = pDevice;
-		tcp->onDisconnect();
-		if (pIO->closeCallback)
-			pIO->closeCallback(pDevice);
-	}
-		break;
-	default:
-		break;
-	}
-	GFreeIO(pIO);
+	
 }
 
 DWORD GAsyncEngine::getMaxThreadCount() const

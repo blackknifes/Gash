@@ -1,17 +1,20 @@
 #ifndef __GFILEDEVICE_H__
 #define __GFILEDEVICE_H__
-#include "GDevice.h"
-#include "../io/GFile.h"
+#include "../io/GIODevice.h"
+#include "GAsyncIO.h"
 
-class GFileDevice: public GDevice
+
+GREFPTR_DEF(GFileDevice);
+
+class GFileDevice: public GIODevice
 {
 public:
 	enum Operation
 	{
-		CreateOnNotExist = CREATE_NEW,
-		Create = CREATE_ALWAYS,
-		Open = OPEN_EXISTING,
-		Truncate = TRUNCATE_EXISTING
+		FileCreateOnNotExist = CREATE_NEW,
+		FileCreate = CREATE_ALWAYS,
+		FileOpen = OPEN_EXISTING,
+		FileTruncate = TRUNCATE_EXISTING
 	};
 	GEnumsDef(Operation);
 
@@ -50,30 +53,57 @@ public:
 	};
 	GEnumsDef(Attribute);
 
-	GFileDevice(const GString& path, Operations op = CreateOnNotExist, Mode mode = ModeReadWrite, ShareMode share = ShareNone, Attributes attributes = Normal);
+	struct Stats
+	{
+		Attributes attributes;
+		unsigned __int64 createTime;
+		unsigned __int64 accessTime;
+		unsigned __int64 lastModifiedTime;
+		unsigned int volumeSerialNumber;
+		unsigned __int64 size;
+		unsigned int numOfLinks;
+		unsigned __int64 fileIndex;
+	};
+
+	static GFileDevicePtr Create(
+		const GString& path, 
+		Operations op = FileCreateOnNotExist, 
+		Mode mode = ModeReadWrite, 
+		ShareModes share = ShareNone);
+	GFileDevice(const GString& path, Operations op = FileCreateOnNotExist, Mode mode = ModeReadWrite, ShareModes share = ShareNone);
 	~GFileDevice();
 	bool isExists() const;
-	virtual bool open(bool async = false) override;
+	virtual bool open() override;
+	bool open(DWORD attributes);
 	virtual void close() override;
 	virtual bool isClosed() const override;
-	virtual IOResult write(const void* pData, size_t size) override;
-	virtual IOResult read(void* pData, size_t size, size_t* readsize = nullptr) override;
 	virtual void flush() override;
-	virtual bool isAsync() const override;
 	virtual void* getNativeHandle() const override;
+	size_t getSize() const;
 
-	GFile getFile() const;
 	const GString& getPath() const;
 	bool canRead() const;
 	bool canWrite() const;
 
+	Stats getStats() const;
+
+	virtual size_t writeSync(const void* pData, size_t size) override;
+	virtual size_t readSync(void* pData, size_t size) override;
+	virtual bool write(const void* pData, size_t size, const WriteCallback& callback) override;
+	virtual bool read(size_t size, const ReadCallback& callback) override;
+	virtual GDataArray readAllSync();
+
 private:
-	GObjectClass(GFileDevice);
+	GObjectClassPooled(GFileDevice);
+	void OnRead(const ReadCallback& callback, GAsyncIOPtr pIO);
+	void OnWrite(const WriteCallback& callback, GAsyncIOPtr pIO);
+	
 	HANDLE m_hFile;
 	GString m_path;
 	Operations m_operations;
 	Mode m_mode;
 	ShareMode m_shareMode;
-	Attributes m_attributes;
 };
+
+typedef GFileDevice::Stats GFileStats;
 #endif

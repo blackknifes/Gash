@@ -55,13 +55,13 @@ void GAsyncLoop::addFirstIdle(GAsyncIdlePtr idle)
 void GAsyncLoop::loop()
 {
 	m_loopFlag = true;
-	while (m_loopFlag && (!m_idleList.empty() || GHasPendingIO()))
+	while (m_loopFlag && (!m_idleList.empty() || GAsyncIO::HasPending()))
 		doOnceLoop();
 }
 
 void GAsyncLoop::doOnceLoop()
 {
-	GAsyncDevice* deviceList[16];
+	GIODevice* deviceList[16];
 	GAsyncIO* ioList[16];
 	size_t size;
 	while ((size = m_pAsyncEngine->getIOTaskList(deviceList, ioList, 16, 200)) != 0)

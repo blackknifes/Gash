@@ -161,6 +161,11 @@ public:
 		return *this;
 	}
 
+	explicit operator bool() const
+	{
+		return m_pData != nullptr;
+	}
+
 	friend class std::set<GScopePointer<_Ty>>;
 	template<typename _Ty> friend class GScopePointer;
 private:

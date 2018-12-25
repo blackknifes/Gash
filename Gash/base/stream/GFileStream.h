@@ -2,7 +2,7 @@
 #define __GFILESTREAM_H__
 
 #include "GStream.h"
-#include "..\io\GFileIO.h"
+#include "../device/GFileDevice.h"
 
 GREFPTR_DEF(GFileInputStream);
 GREFPTR_DEF(GFileOutputStream);
@@ -11,8 +11,8 @@ GREFPTR_DEF(GFileStream);
 class GFileInputStream: public GInputStream
 {
 public:
-	using Operation = GFileIO::Operation;
-	using Operations = GFileIO::Operations;
+	using Operation = GFileDevice::Operation;
+	using Operations = GFileDevice::Operations;
 
 	GFileInputStream(const GString& path);
 	virtual size_t read(void* pData, size_t _size) override;
@@ -26,8 +26,8 @@ protected:
 class GFileOutputStream: public GOutputStream
 {
 public:
-	using Operation = GFileIO::Operation;
-	using Operations = GFileIO::Operations;
+	using Operation = GFileDevice::Operation;
+	using Operations = GFileDevice::Operations;
 
 	GFileOutputStream(const GString& path);
 	virtual void write(const void* pData, size_t _size) override;
@@ -46,13 +46,13 @@ protected:
 class GFileStream: public GFileInputStream, public GFileOutputStream
 {
 public:
-	using Operation = GFileIO::Operation;
-	using Operations = GFileIO::Operations;
-	using Mode = GFileIO::Mode;
-	using ShareMode = GFileIO::ShareMode;
-	using ShareModes = GFileIO::ShareModes;
+	using Operation = GFileDevice::Operation;
+	using Operations = GFileDevice::Operations;
+	using Mode = GFileDevice::Mode;
+	using ShareMode = GFileDevice::ShareMode;
+	using ShareModes = GFileDevice::ShareModes;
 	GFileStream(const GString& path, 
-		Operations op = Operation::Create,
+		Operations op = Operation::FileCreate,
 		Mode mode = Mode::ModeReadWrite,
 		ShareModes shareMode = 
 			ShareMode::ShareRead | ShareMode::ShareWrite | ShareMode::ShareDelete

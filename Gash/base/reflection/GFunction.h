@@ -5,7 +5,7 @@
 
 GREFPTR_DEF(GFunction);
 
-class GFunction : public GObject
+class GFunction : public virtual GObject
 {
 public:
 	template<typename _Class, typename _retTy, typename... _argsTy>

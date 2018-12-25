@@ -1,10 +1,13 @@
 #include "GBufferIO.h"
+#include "GBufferPool.h"
 
 #pragma warning(disable: 4018)
 
 #define BytesOfBuffer(size) (size << 14)
 #define SizeOfBuffer(size) (size >> 14)
-#define AlignBuffer(size) (((size) + sizeof(Buffer) - 1) & ~(sizeof(Buffer) - 1))
+#define AlignBuffer(size) (((size) + GBufferIO::buffer_size - 1) & ~(GBufferIO::buffer_size - 1))
+
+static GBufferPool<GBufferIO::buffer_size> s_bufferPool;
 
 static bool IsNewLine(char ch, int& flag)
 {
@@ -25,13 +28,56 @@ static bool IsNewLine(char ch, int& flag)
 	return false;
 }
 
+void* GBufferIO::AllocBuffer()
+{
+	return s_bufferPool.pop();
+}
+
+void GBufferIO::DeallocBuffer(void* pData)
+{
+	s_bufferPool.push(pData);
+}
+
 GBufferIO::GBufferIO()
 	:m_readOffset(0), m_writeOffset(0)
 {
 
 }
 
-size_t GBufferIO::read(void* pData, size_t _size)
+bool GBufferIO::read(size_t size, const ReadCallback& callback)
+{
+	return false;
+}
+
+size_t GBufferIO::writeSync(const void* pData, size_t _size)
+{
+	reserve(m_writeOffset + _size);
+	size_t total = _size;
+	size_t index = SizeOfBuffer(m_writeOffset);
+	size_t offset = m_writeOffset & 0x3FFF;
+	m_writeOffset += _size;
+	void* pDest = (unsigned char*)m_bufferList[index++] + offset;
+	const unsigned char* ptr = (const unsigned char*)pData;
+	{
+		size_t writeSize = GBufferIO::buffer_size - offset;
+		if (writeSize > _size)
+			writeSize = _size;
+		memcpy_s(pDest, writeSize, ptr, writeSize);
+		ptr += writeSize;
+		_size -= writeSize;
+	}
+	while (_size != 0)
+	{
+		pDest = (unsigned char*)m_bufferList[index++];
+		size_t writeSize = _size > GBufferIO::buffer_size ? GBufferIO::buffer_size : _size;
+		memcpy_s(pDest, writeSize, ptr, writeSize);
+		ptr += writeSize;
+		_size -= writeSize;
+	}
+	return _size;
+}
+
+size_t GBufferIO::readSync(void* pData, size_t _size)
 {
 	{
 		size_t readableSize = this->size();
@@ -47,7 +93,7 @@ size_t GBufferIO::read(void* pData, size_t _size)
 	unsigned char* ptr = (unsigned char*)pData;
 
 	{
-		size_t readSize = sizeof(Buffer) - offset;
+		size_t readSize = GBufferIO::buffer_size - offset;
 		if (readSize > _size)
 			readSize = _size;
 		memcpy_s(ptr, readSize, pSrc, readSize);
@@ -57,7 +103,7 @@ size_t GBufferIO::read(void* pData, size_t _size)
 	while (_size != 0)
 	{
 		pSrc = (unsigned char*)m_bufferList[index++];
-		size_t readSize = _size > sizeof(Buffer) ? sizeof(Buffer) : _size;
+		size_t readSize = _size > GBufferIO::buffer_size ? GBufferIO::buffer_size : _size;
 		memcpy_s(ptr, readSize, pSrc, readSize);
 		ptr += readSize;
 		_size -= readSize;
@@ -67,38 +113,9 @@ size_t GBufferIO::read(void* pData, size_t _size)
 	if (index > 1)
 	{
 		m_bufferList.erase(m_bufferList.begin(), m_bufferList.begin() + index - 1);
-		size_t removeSize = sizeof(Buffer) * (index - 1);
+		size_t removeSize = GBufferIO::buffer_size * (index - 1);
 		m_readOffset -= removeSize;
 		m_writeOffset -= removeSize;
-	}
-
-	return total;
-}
-
-size_t GBufferIO::write(const void* pData, size_t _size)
-{
-	reserve(m_writeOffset + _size);
-	size_t total = _size;
-	size_t index = SizeOfBuffer(m_writeOffset);
-	size_t offset = m_writeOffset & 0x3FFF;
-	m_writeOffset += _size;
-	void* pDest = (unsigned char*)m_bufferList[index++] + offset;
-	const unsigned char* ptr = (const unsigned char*)pData;
-	{
-		size_t writeSize = sizeof(Buffer) - offset;
-		if (writeSize > _size)
-			writeSize = _size;
-		memcpy_s(pDest, writeSize, ptr, writeSize);
-		ptr += writeSize;
-		_size -= writeSize;
-	}
-	while (_size != 0)
-	{
-		pDest = (unsigned char*)m_bufferList[index++];
-		size_t writeSize = _size > sizeof(Buffer) ? sizeof(Buffer) : _size;
-		memcpy_s(pDest, writeSize, ptr, writeSize);
-		ptr += writeSize;
-		_size -= writeSize;
 	}
 	return total;
 }
@@ -107,44 +124,14 @@ void GBufferIO::flush()
 {
 
 }
-
-__int64 GBufferIO::seekRead(__int64 offset, SeekType pos /*= SeekCur*/)
+void* GBufferIO::getNativeHandle() const
 {
-	__int64 readOffset = m_readOffset;
-	switch (pos)
-	{
-	case GIODevice::SeekCur:
-		readOffset += offset;
-		break;
-	case GIODevice::SeekBegin:
-		readOffset = offset;
-		break;
-	case GIODevice::SeekEnd:
-		readOffset -= offset;
-		break;
-	default:
-		break;
-	}
-	if (readOffset > m_writeOffset)
-		readOffset = m_writeOffset;
-	else if (readOffset < 0)
-		readOffset = 0;
-	return m_readOffset;
+	return nullptr;
 }
 
-__int64 GBufferIO::seekWrite(__int64 offset, SeekType pos /*= SeekCur*/)
+bool GBufferIO::write(const void* pData, size_t size, const WriteCallback& callback)
 {
-	return m_writeOffset;
-}
-
-__int64 GBufferIO::tellRead() const
-{
-	return m_readOffset;
-}
-
-__int64 GBufferIO::tellWrite() const
-{
-	return m_writeOffset;
+	return false;
 }
 
 void GBufferIO::close()
@@ -155,16 +142,6 @@ void GBufferIO::close()
 bool GBufferIO::isClosed() const
 {
 	return false;
-}
-
-int GBufferIO::getErrorCode() const
-{
-	return 0;
-}
-
-GString GBufferIO::getErrorMessage() const
-{
-	return L"";
 }
 
 size_t GBufferIO::readline(void* pBuffer, size_t bufsize)
@@ -187,14 +164,14 @@ size_t GBufferIO::readline(void* pBuffer, size_t bufsize)
 			--total;
 			if (total > bufsize)
 				return total;
-			readsize = read(pBuffer, total);
+			readsize = readSync(pBuffer, total);
 			m_readOffset += 2;
 			return readsize;
 		}
 
 		--readsize;
 		++total;
-		if (++offset == sizeof(Buffer))
+		if (++offset == GBufferIO::buffer_size)
 			pDest = (char*)m_bufferList[index++];
 		else
 			++pDest;
@@ -219,13 +196,13 @@ void GBufferIO::reserve(size_t _capacity)
 		return;
 	size_t count = SizeOfBuffer(AlignBuffer(_capacity)) - m_bufferList.size();
 	for (size_t i = 0; i < count; ++i)
-		m_bufferList.push_back((Buffer*)malloc(sizeof(Buffer)));
+		m_bufferList.push_back(s_bufferPool.pop());
 }
 
 void GBufferIO::clear()
 {
-	for (Buffer* pBuffer : m_bufferList)
-		free(pBuffer);
+	for (void* pBuffer : m_bufferList)
+		s_bufferPool.push(pBuffer);
 	m_writeOffset = m_readOffset = 0;
 	m_bufferList.clear();
 }
@@ -234,6 +211,11 @@ GDataArray GBufferIO::readAll()
 {
 	GDataArray dataArray;
 	dataArray.resize(this->size());
-	read(dataArray.data(), this->size());
+	readSync(dataArray.data(), this->size());
 	return std::move(dataArray);
+}
+
+bool GBufferIO::open()
+{
+	return true;
 }

@@ -8,12 +8,12 @@ GBufferStream::GBufferStream()
 
 size_t GBufferStream::read(void* pData, size_t _size)
 {
-	return getDevice()->read(pData, _size);
+	return getDevice()->readSync(pData, _size);
 }
 
 void GBufferStream::write(const void* pData, size_t _size)
 {
-	getDevice()->write(pData, _size);
+	getDevice()->writeSync(pData, _size);
 }
 
 void GBufferStream::flush()

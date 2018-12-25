@@ -1,24 +1,22 @@
 #ifndef __GBUFFERIO_H__
 #define __GBUFFERIO_H__
-
-#include "GIODevice.h"
 #include <vector>
+#include "../GDataArray.h"
+#include "GIODevice.h"
+
+GREFPTR_DEF(GBufferIO);
 
 class GBufferIO: public GIODevice
 {
 public:
+	static const size_t buffer_size = 0x4000;
+	static void* AllocBuffer();
+	static void DeallocBuffer(void* pData);
+
+
 	GBufferIO();
-	virtual size_t read(void* pData, size_t bytes) override;
-	virtual size_t write(const void* pData, size_t bytes) override;
-	virtual void flush() override;
-	virtual __int64 seekRead(__int64 offset, SeekType pos = SeekCur) override;
-	virtual __int64 seekWrite(__int64 offset, SeekType pos = SeekCur) override;
-	virtual __int64 tellRead() const override;
-	virtual __int64 tellWrite() const override;
-	virtual void close() override;
-	virtual bool isClosed() const override;
-	virtual int getErrorCode() const override;
-	virtual GString getErrorMessage() const override;
+	virtual void close();
+	virtual bool isClosed() const;
 	virtual size_t readline(void* pBuffer, size_t bufsize);
 
 	size_t size() const;
@@ -27,13 +25,19 @@ public:
 
 	void clear();
 	GDataArray readAll();
+	virtual void flush() override;
+	virtual void* getNativeHandle() const override;
+
+	virtual bool open() override;
+
+	virtual bool write(const void* pData, size_t size, const WriteCallback& callback) override;
+	virtual bool read(size_t size, const ReadCallback& callback) override;
+	virtual size_t writeSync(const void* pData, size_t size) override;
+	virtual size_t readSync(void* pData, size_t size) override;
+
 private:
 	GObjectClassPooled(GBufferIO);
-	struct Buffer
-	{
-		unsigned char buf[0x4000];
-	};
-	std::vector<Buffer*> m_bufferList;
+	std::vector<void*> m_bufferList;
 	size_t m_readOffset;
 	size_t m_writeOffset;
 };

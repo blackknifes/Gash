@@ -35,11 +35,10 @@
 #include "base/schedule/condition/GConditionCallback.h"
 #include "base/schedule/GTaskCallback.h"
 #include "base/async/GAsyncLoop.h"
-#include "base/async/fileio/GAsyncFile.h"
-#include "base/async/fileio/GAsyncTCPSocket.h"
 #include "base/stream/GBufferStream.h"
 
 #include "ares.h"
+#include "base/device/GFileDevice.h"
 
 const char buf[] = "GET / HTTP/1.1\r\n\r\n";
 
@@ -135,101 +134,71 @@ void InitSocketFunctions(ares_channel channel, HANDLE hIOCP)
 int main()
 {
 	// 	Win32BaseTypeRegister();
-	// 
-	// 	GAsyncTCPSocketPtr pSocket = GAsyncTCPSocket::CreatePooled(L"http://www.baidu.com");
-	// 
-	// 	if (!GAsyncLoop::GetDefaultEngine()->addDevice(pSocket))
-	// 		printf("关联失败\n");
-	// 
-	// 	if (!pSocket->open([](GAsyncDevicePtr pDevice){
-	// 		GAsyncTCPSocketPtr pSocket = pDevice;
-	// 		if (!pSocket->write(buf, sizeof(buf) - 1, [](GAsyncDevicePtr pDevice) {
-	// 			GAsyncTCPSocketPtr pSocket = pDevice;
-	// 			auto cb = [pSocket](GAsyncDevicePtr pDevice, const void* pData, size_t readSize) {
-	// 				GString str = GString::FromEncoding((char*)pData, readSize, GEncoding::EncodingUtf8);
-	// 				printf("%s\n", str.toAnsi().data());
-	// 			};
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 			pSocket->read(0x4000, cb);
-	// 		}))
-	// 		{
-	// 			printf("写出数据失败");
-	// 			return;
-	// 		}
-	// 	}))
-	// 	{
-	// 		_getch();
-	// 		return -1;
-	// 	}
-	// 
-	// 	GAsyncLoop::GetDefault()->loop();
 
-	WSADATA wsadata = {};
-	WSAStartup(MAKEWORD(2, 2), &wsadata);
+// 	WSADATA wsadata = {};
+// 	WSAStartup(MAKEWORD(2, 2), &wsadata);
+// 
+// 	HANDLE hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
+// 
+// 	ares_library_init(ARES_LIB_INIT_ALL);
+// 
+// 	ares_channel channel;
+// 
+// 	in_addr addr[2];;
+// 	ares_inet_pton(AF_INET, "223.5.5.5", &addr);
+// 	ares_inet_pton(AF_INET, "223.6.6.6", &addr);
+// 	ares_options options = {};
+// 	options.servers = addr;
+// 	options.nservers = 2;
+// 
+// 	ares_init_options(&channel, &options, ARES_OPT_SERVERS);
+// 	InitSocketFunctions(channel, hIOCP);
+// 
+// 	sockaddr_in dnsServer = {};
+// 	ares_gethostbyname(channel, "www.baidu.com", AF_INET, [](void *arg,
+// 		int status,
+// 		int timeouts,
+// 		struct hostent *hostent) {
+// 		if (status != ARES_SUCCESS)
+// 		{
+// 			printf("%s\n", ares_strerror(status));
+// 			return;
+// 		}
+// 
+// 		char* addr;
+// 		size_t i = 0;
+// 		while ((addr = hostent->h_addr_list[i++]) != nullptr)
+// 		{
+// 			char buf[64] = {};
+// 			printf("%s\n", ares_inet_ntop(AF_INET, (void*)addr, buf, 64));
+// 		}
+// 	}, nullptr);
+// 
+// 	while (1) {
+// 		DWORD numTransfer = 0;
+// 		ULONG_PTR key = 0;
+// 		LPOVERLAPPED pOverlapped;
+// 		GetQueuedCompletionStatus(hIOCP, &numTransfer, &key, &pOverlapped, INFINITE);
+// 		OVERLAPPED_EXT* pExt = CONTAINING_RECORD(pOverlapped, OVERLAPPED_EXT, overlapped);
+// 		DNSQuery* pQuery = (DNSQuery*)key;
+// 		pQuery->result = numTransfer;
+// 		if (pExt->callback)
+// 			pExt->callback();
+// 		pQuery->result = 0;
+// 		Sleep(500);
+// 	}
+// 	auto t = std::allocator<int>();
+// 
+// 	ares_library_cleanup();
+// 	WSACleanup();
 
-	HANDLE hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 
-	ares_library_init(ARES_LIB_INIT_ALL);
+	GFileDevicePtr fileDevice = GFileDevice::Create(L"E:/Test.txt", GFileDevice::FileOpen);
+	if (!fileDevice->open())
+		return -1;
+	fileDevice->writeSync("0123456789", 10);
+	fileDevice->close();
 
-	ares_channel channel;
-
-	in_addr addr[2];;
-	ares_inet_pton(AF_INET, "223.5.5.5", &addr);
-	ares_inet_pton(AF_INET, "223.6.6.6", &addr);
-	ares_options options = {};
-	options.servers = addr;
-	options.nservers = 2;
-
-	ares_init_options(&channel, &options, ARES_OPT_SERVERS);
-	InitSocketFunctions(channel, hIOCP);
-
-	sockaddr_in dnsServer = {};
-	ares_gethostbyname(channel, "www.baidu.com", AF_INET, [](void *arg,
-		int status,
-		int timeouts,
-		struct hostent *hostent) {
-		if (status != ARES_SUCCESS)
-		{
-			printf("%s\n", ares_strerror(status));
-			return;
-		}
-
-		char* addr;
-		size_t i = 0;
-		while ((addr = hostent->h_addr_list[i++]) != nullptr)
-		{
-			char buf[64] = {};
-			printf("%s\n", ares_inet_ntop(AF_INET, (void*)addr, buf, 64));
-		}
-	}, nullptr);
-
-	while (1) {
-		DWORD numTransfer = 0;
-		ULONG_PTR key = 0;
-		LPOVERLAPPED pOverlapped;
-		GetQueuedCompletionStatus(hIOCP, &numTransfer, &key, &pOverlapped, INFINITE);
-		OVERLAPPED_EXT* pExt = CONTAINING_RECORD(pOverlapped, OVERLAPPED_EXT, overlapped);
-		DNSQuery* pQuery = (DNSQuery*)key;
-		pQuery->result = numTransfer;
-		if (pExt->callback)
-			pExt->callback();
-		pQuery->result = 0;
-		Sleep(500);
-	}
-	auto t = std::allocator<int>();
-
-	ares_library_cleanup();
-	WSACleanup();
 	_getch();
 	return 0;
 }

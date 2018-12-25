@@ -6,7 +6,7 @@
 
 GREFPTR_DEF(GField);
 
-class GField: public GObject
+class GField: public virtual GObject
 {
 public:
 	template<typename _Class, typename _Ty>

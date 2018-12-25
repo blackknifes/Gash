@@ -1,43 +1,24 @@
 #include "GIODevice.h"
 
-
-
-size_t GIODevice::write(const GDataArray& pBuffer)
+GIODevice::GIODevice()
+	:m_iErrorCode(0)
 {
-	return this->write(pBuffer.data(), pBuffer.size());
+	
 }
 
-GDataArray GIODevice::read(size_t bytes)
+int GIODevice::getErrorCode() const
 {
-	GDataArray dataArray(bytes);
-	bytes = this->read(dataArray.data(), bytes);
-	dataArray.resize(bytes);
-	return std::move(dataArray);
+	return m_iErrorCode;
 }
 
-GDataArray GIODevice::readAll()
+std::string GIODevice::getErrorMessage() const
 {
-	if (isClosed())
-		return GDataArray();
-	__int64 offset = tellRead();
-	__int64 _size = seekRead(0, SeekEnd) - offset;
-	seekRead(offset, SeekBegin);
-	GDataArray buffer(_size);
-	read(buffer.data(), _size);
-	return std::move(buffer);
+	char buf[1024] = {};
+	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, m_iErrorCode, LANG_USER_DEFAULT, buf, sizeof(buf), nullptr);
+	return buf;
 }
 
-void GIODevice::resetRead()
+void GIODevice::setErrorCode(int errCode)
 {
-	seekRead(0, SeekBegin);
-}
-
-void GIODevice::resetWrite()
-{
-	seekWrite(0, SeekBegin);
-}
-
-void GIODevice::reset()
-{
-	resetRead(); resetWrite();
+	m_iErrorCode = errCode;
 }

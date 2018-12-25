@@ -27,9 +27,6 @@
     <ClCompile Include="base\io\GFileIO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="base\io\GIODevice.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="base\reflection\GClass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -114,21 +111,6 @@
     <ClCompile Include="base\algorithm\GEncoder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="base\async\fileio\GAsyncDevice.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="base\async\fileio\GAsyncFile.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="base\async\fileio\GAsyncHttp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="base\async\fileio\GAsyncIO.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="base\async\fileio\GAsyncTCPSocket.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="base\async\GAsyncEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -136,9 +118,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="base\charset\GEncoding.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="base\device\GDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="base\device\GFileDevice.cpp">
@@ -213,6 +192,18 @@
     <ClCompile Include="base\GAllocator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="base\device\GIOCallback.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\device\GAsyncIO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GIODevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\exception_handler\GNewHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\FileDialog\GFileDialog.h">
@@ -225,9 +216,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\io\GFileIO.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\io\GIODevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\reflection\GClass.h">
@@ -362,27 +350,6 @@
     <ClInclude Include="base\algorithm\GEncoder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\async\fileio\GAsyncDevice.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GAsyncFile.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GAsyncHttp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GAsyncIO.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GAsyncTCPSocket.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GHttpRequest.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\async\fileio\GHttpResponse.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="base\async\GAsyncEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -393,9 +360,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\charset\GEncoding.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="base\device\GDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\device\GFileDevice.h">
@@ -494,13 +458,34 @@
     <ClInclude Include="base\net\GDnsQuery.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\net\GOverlappedCallback.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="base\math\GMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\GAllocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GCallable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\device\GIOCallback.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\device\GAsyncIO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GIODevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\exception_handler\GNewHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GBufferPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GMemoryGC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GCallback.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -53,17 +53,20 @@ void GStaticAllocator::deallocate(void* pData)
 void GStaticAllocator::reserve_more(size_t count)
 {
 	static size_t allocCount = 512 / m_size;
-	EnterCriticalSection(&m_section);
 	for (size_t i = 0; i < count; i += allocCount)
 	{
 		char* pData = (char*)malloc(512);
 		m_pBlockArray.push_back(pData);
-		GStaticMemoryNode* pNode = (GStaticMemoryNode*)malloc(sizeof(GStaticMemoryNode));
+		GStaticMemoryNode* pNode = (GStaticMemoryNode*)pData;
+		GStaticMemoryNode* pCur = (GStaticMemoryNode*)m_pBufferArray;
+		m_pBufferArray = pNode;
 		for (size_t j = 0; j < allocCount; ++j)
-			pNode = (GStaticMemoryNode*)(pData + m_size);
-		pNode->next = (GStaticMemoryNode*)m_pBufferArray;		
+		{
+			pNode->next = pNode + 1;
+			++pNode;
+		}
+		pNode->next = pCur;
 	}
-	LeaveCriticalSection(&m_section);
 }
 
 void GStaticAllocator::setSize(size_t size)

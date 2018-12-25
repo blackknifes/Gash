@@ -9,7 +9,7 @@
 #include <iostream>
 #include "GTypes.h"
 #include "reflection/GUserType.h"
-#include "GMemoryBlockPool.h"
+#include "GAllocator.h"
 #include "reflection/GReflectionObject.h"
 #include "GStringPiece.h"
 
@@ -50,7 +50,7 @@ public:
 
 private:
 	void init(const void* pObject);
-	GMemoryBlock m_pObject;
+	void* m_pUserData;
 	GUserTypePtr m_userType;
 };
 
@@ -89,6 +89,7 @@ public:
 	static GValue fromUserData(const void* userdata, const GUID& typeId);
 	static GValue fromUserData(const void* userdata, const char* typeName);
 	static GValue fromUserData(const void* userdata, GUserTypePtr userType);
+	static GValue fromObject(GReflectionObjectPtr pObject);
 
 
 	GValue();

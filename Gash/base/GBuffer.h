@@ -8,13 +8,13 @@ class GBuffer: public virtual GObject
 {
 public:
 	static GBufferPtr CreateBuffer(size_t size);
+	GBuffer();
 
 	const unsigned char* data() const;
 	unsigned char* data();
 	size_t size() const;
 private:
 	GObjectClassPooled(GBuffer);
-	GBuffer();
 	~GBuffer();
 
 	unsigned char* m_pData;

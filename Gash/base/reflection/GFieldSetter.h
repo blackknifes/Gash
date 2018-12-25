@@ -5,7 +5,7 @@
 
 GREFPTR_DEF(GFieldSetter);
 
-class GFieldSetter: public GObject
+class GFieldSetter: public virtual GObject
 {
 public:
 	template<typename _Class, typename _Ty>
