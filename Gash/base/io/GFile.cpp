@@ -22,29 +22,29 @@ GFile GFile::GetDir(DirType type)
 
 GDataArray GFile::ReadFile(const GString& path)
 {
-	GFileDevice fileIO(path, GFileDevice::FileOpen, GFileDevice::ModeRead, GFileDevice::ShareWrite);
-	if (fileIO.isClosed())
+	GFileDevice fileIO(path, GOperation::FileOpen, GFileMode::ModeRead, GFileShareMode::ShareWrite);
+	if (!fileIO.open())
 		return GDataArray();
 	return fileIO.readAllSync();
 }
 
 bool GFile::WriteFile(const GString& path, const GDataArray& buffer)
 {
-	GFileDevice fileIO(path, GFileDevice::FileCreate, GFileDevice::ModeWrite, GFileDevice::ShareRead);
-	if (fileIO.isClosed())
+	GFileDevice fileIO(path, GOperation::FileCreate, GFileMode::ModeWrite, GFileShareMode::ShareRead);
+	if (!fileIO.open())
 		return false;
 	return fileIO.writeSync(buffer.data(), buffer.size()) == buffer.size();
 }
 
 bool GFile::WriteFile(const GString& path, const void* pData, size_t bytes)
 {
-	GFileDevice fileIO(path, GFileDevice::FileCreate, GFileDevice::ModeWrite, GFileDevice::ShareRead);
-	if (fileIO.isClosed())
+	GFileDevice fileIO(path, GOperation::FileCreate, GFileMode::ModeWrite, GFileShareMode::ShareRead);
+	if (!fileIO.open())
 		return false;
 	return fileIO.writeSync(pData, bytes) == bytes;
 }
 
-GFile::Attributes GFile::GetFileAttributes(const GString& path)
+GFileAttributes GFile::GetFileAttributes(const GString& path)
 {
 	return GetFileAttributesW(path.data());
 }
@@ -134,14 +134,14 @@ bool GFile::isValid() const
 	return m_path.isValid();
 }
 
-GFileDevicePtr GFile::open(Mode mode) const
+GFileDevicePtr GFile::open(GFileMode mode) const
 {
-	return new GFileDevice(getPath(), GFileDevice::FileOpen, mode);
+	return new GFileDevice(getPath(), GOperation::FileOpen, mode);
 }
 
-GFileDevicePtr GFile::openShare(Mode mode, ShareModes shareMode) const
+GFileDevicePtr GFile::openShare(GFileMode mode, GFileShareModes shareMode) const
 {
-	return new GFileDevice(getPath(), GFileDevice::FileOpen, mode, shareMode);
+	return new GFileDevice(getPath(), GOperation::FileOpen, mode, shareMode);
 }
 
 bool GFile::create(const GString& newPath)
@@ -186,7 +186,7 @@ bool GFile::hide()
 	return SetFileAttributesW(tmp.data(), attr | FILE_ATTRIBUTE_HIDDEN) != FALSE;
 }
 
-bool GFile::setFileAttributes(Attributes attributes)
+bool GFile::setFileAttributes(GFileAttributes attributes)
 {
 	return SetFileAttributesW(getPath().data(), attributes) != FALSE;
 }
@@ -223,20 +223,20 @@ bool GFile::isEncrypted() const
 
 size_t GFile::getFileSize() const
 {
-	GFileDevice file(getPath(), GFileDevice::FileOpen, GFileDevice::ModeRead, GFileDevice::ShareRead | GFileDevice::ShareWrite);
+	GFileDevice file(getPath(), GOperation::FileOpen, GFileMode::ModeRead, GFileShareMode::ShareRead | GFileShareMode::ShareWrite);
 	if (file.isClosed())
 		return 0;
 	return file.getSize();
 }
 
-GFile::Attributes GFile::getFileAttributes() const
+GFileAttributes GFile::getFileAttributes() const
 {
 	return ::GetFileAttributesW(getPath().data());
 }
 
 GFileStats GFile::getFileStats() const
 {
-	GFileDevice file(getPath(), GFileDevice::FileOpen, GFileDevice::ModeRead, GFileDevice::ShareRead | GFileDevice::ShareWrite);
+	GFileDevice file(getPath(), GOperation::FileOpen, GFileMode::ModeRead, GFileShareMode::ShareRead | GFileShareMode::ShareWrite);
 	if (file.isClosed())
 		return GFileStats();
 	return file.getStats();

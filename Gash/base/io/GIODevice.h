@@ -1,6 +1,7 @@
 #ifndef __GDEVICE_H__
 #define __GDEVICE_H__
 #include "../GObject.h"
+#include "GIOEnums.h"
 #include <functional>
 
 GREFPTR_DEF(GIODevice);

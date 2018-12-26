@@ -192,7 +192,7 @@ size_t GBufferIO::capacity() const
 
 void GBufferIO::reserve(size_t _capacity)
 {
-	if (capacity() > _capacity)
+	if (capacity() >= _capacity)
 		return;
 	size_t count = SizeOfBuffer(AlignBuffer(_capacity)) - m_bufferList.size();
 	for (size_t i = 0; i < count; ++i)

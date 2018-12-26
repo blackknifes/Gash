@@ -189,6 +189,10 @@ public:
 	size_t hashCode() const;
 	GString clone() const;
 
+	bool isIp() const;
+	bool isIpV4() const;
+	bool isIpV6() const;
+
 	friend class GRegex;
 private:
 	std::wstring m_string;

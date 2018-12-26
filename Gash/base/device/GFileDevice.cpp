@@ -1,12 +1,14 @@
 #include "GFileDevice.h"
 #include "GAsyncIO.h"
+#include "../platform/GEvent.h"
+#include "../platform/GEventPool.h"
 
-GFileDevicePtr GFileDevice::Create(const GString& path, Operations op /*= FileCreateOnNotExist*/, Mode mode /*= ModeReadWrite*/, ShareModes share /*= ShareNone*/)
+GFileDevicePtr GFileDevice::Create(const GString& path, GOperations op /*= FileCreateOnNotExist*/, GFileMode mode /*= ModeReadWrite*/, GFileShareModes share /*= ShareNone*/)
 {
 	return GFileDevice::CreatePooled(path, op, mode, share);
 }
 
-GFileDevice::GFileDevice(const GString& path, Operations op /*= CreateOnNotExist*/, Mode mode /*= ModeReadWrite*/, ShareModes share /*= ShareNone*/)
+GFileDevice::GFileDevice(const GString& path, GOperations op /*= CreateOnNotExist*/, GFileMode mode /*= ModeReadWrite*/, GFileShareModes share /*= ShareNone*/)
 	:m_hFile(nullptr), m_path(path), m_operations(op), m_mode(mode), m_shareMode(share)
 {
 
@@ -29,7 +31,7 @@ bool GFileDevice::open()
 
 bool GFileDevice::open(DWORD attributes)
 {
-	if (m_operations == FileCreateOnNotExist && isExists())
+	if (m_operations == GOperation::FileCreateOnNotExist && isExists())
 		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, OPEN_EXISTING, attributes | FILE_FLAG_OVERLAPPED, nullptr);
 	else
 		m_hFile = CreateFileW(m_path.data(), m_mode, m_shareMode, nullptr, m_operations, attributes | FILE_FLAG_OVERLAPPED, nullptr);
@@ -88,30 +90,35 @@ bool GFileDevice::canWrite() const
 	return (m_mode & ModeWrite) != 0;
 }
 
-GFileDevice::Stats GFileDevice::getStats() const
+GFileStats GFileDevice::getStats() const
 {
-	return Stats();
+	return GFileStats();
 }
 
 size_t GFileDevice::writeSync(const void* pData, size_t size)
 {
-	OVERLAPPED overlapped;
-	memset(&overlapped, 0, sizeof(overlapped));
-	if (WriteFile(m_hFile, pData, size, nullptr, &overlapped) == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
+	GAsyncIOPtr pIO = GAsyncIO::CreateIO(this, GAsyncIO::IO_Write);
+	pIO->AddRef();
+	pIO->setupEvent();
+	if (WriteFile(m_hFile, pData, size, nullptr, pIO->getOverlapped()) == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
 		return -1;
-
 	DWORD writeSize;
-	if (GetOverlappedResult(m_hFile, &overlapped, &writeSize, TRUE) == FALSE)
-		return -1;
+	GetOverlappedResult(m_hFile, pIO->getOverlapped(), &writeSize, TRUE);
+	pIO->setState(GAsyncIO::IO_End);
 	return writeSize;
 }
 
 size_t GFileDevice::readSync(void* pData, size_t size)
 {
-	DWORD writeSize = 0;
-	if (ReadFile(m_hFile, pData, size, &writeSize, nullptr) == FALSE)
+	GAsyncIOPtr pIO = GAsyncIO::CreateIO(this, GAsyncIO::IO_Write);
+	pIO->setupEvent();
+	pIO->AddRef();
+	if (ReadFile(m_hFile, pData, size, nullptr, pIO->getOverlapped()) == FALSE && WSAGetLastError() != ERROR_IO_PENDING)
 		return -1;
-	return writeSize;
+	DWORD readSize;
+	GetOverlappedResult(m_hFile, pIO->getOverlapped(), &readSize, TRUE);
+	pIO->setState(GAsyncIO::IO_End);
+	return readSize;
 }
 
 bool GFileDevice::write(const void* pData, size_t size, const WriteCallback& callback)

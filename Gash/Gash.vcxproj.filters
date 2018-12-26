@@ -123,9 +123,6 @@
     <ClCompile Include="base\device\GFileDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="base\device\GSocket.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="base\net\GHttpClient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -202,6 +199,36 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="base\exception_handler\GNewHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\platform\GEvent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\platform\win32\GWin32Event.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\platform\GEventPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\sync\GFileSync.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GSocketPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\sync\GSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GNSLookup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GErrno.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\net\GNetEngine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GGUnzipStream.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -455,9 +482,6 @@
     <ClInclude Include="base\GStrings.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\net\GDnsQuery.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="base\math\GMath.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -486,6 +510,45 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\GCallback.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\GEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\win32\GWin32Event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\platform\GEventPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\block_container\GBlockingStack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\sync\GIODeviceSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\sync\GFileSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GIOEnums.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\sync\GSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GSocketPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GNSLookup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GErrno.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\net\GNetEngine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GGUnzipStream.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

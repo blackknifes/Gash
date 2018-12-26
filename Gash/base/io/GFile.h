@@ -8,18 +8,13 @@
 class GFile
 {
 public:
-	using Attributes = GFileDevice::Attributes;
-	using Attribute = GFileDevice::Attribute;
-	using Mode = GFileDevice::Mode;
-	using ShareMode = GFileDevice::ShareMode;
-	using ShareModes = GFileDevice::ShareModes;
 	using DirType = GShell::DirectoryType;
 
 	static GFile GetDir(DirType type);
 	static GDataArray ReadFile(const GString& path);
 	static bool WriteFile(const GString& path, const GDataArray& buffer);
 	static bool WriteFile(const GString& path, const void* pData, size_t bytes);
-	static Attributes GetFileAttributes(const GString& path);
+	static GFileAttributes GetFileAttributes(const GString& path);
 
 	GFile(const GPath& path);
 
@@ -34,8 +29,8 @@ public:
 /*	GString getRelativePath(const GPath& path) const;*/
 
 	bool isValid() const;
-	GFileDevicePtr open(Mode mode) const;
-	GFileDevicePtr openShare(Mode mode, ShareModes shareMode) const;
+	GFileDevicePtr open(GFileMode mode) const;
+	GFileDevicePtr openShare(GFileMode mode, GFileShareModes shareMode) const;
 
 	bool create(const GString& newPath);
 	bool createTemporary(const GString& newPath);
@@ -44,7 +39,7 @@ public:
 	bool rename(const GString& newPath);
 	bool hide();
 
-	bool setFileAttributes(Attributes attributes);
+	bool setFileAttributes(GFileAttributes attributes);
 
 	bool isDirectory() const;
 	bool isExists() const;
@@ -54,7 +49,7 @@ public:
 	bool isEncrypted() const;
 
 	size_t getFileSize() const;
-	Attributes getFileAttributes() const;
+	GFileAttributes getFileAttributes() const;
 	GFileStats getFileStats() const;
 	void write(const void* pData, size_t size) const;
 	void write(const GDataArray& buffer) const;

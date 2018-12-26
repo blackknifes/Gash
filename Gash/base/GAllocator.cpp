@@ -3,6 +3,12 @@
 
 static GStaticAllocatorPool staticAllocatorPool;
 
+template<typename _Ty>
+static _Ty* MovePointer(_Ty* pData, int offset)
+{
+	return (_Ty*)((unsigned char*)pData + offset);
+}
+
 struct GStaticMemoryNode
 {
 	GStaticMemoryNode* next;
@@ -60,10 +66,10 @@ void GStaticAllocator::reserve_more(size_t count)
 		GStaticMemoryNode* pNode = (GStaticMemoryNode*)pData;
 		GStaticMemoryNode* pCur = (GStaticMemoryNode*)m_pBufferArray;
 		m_pBufferArray = pNode;
-		for (size_t j = 0; j < allocCount; ++j)
+		for (size_t j = 0; j < allocCount - 1; ++j)
 		{
-			pNode->next = pNode + 1;
-			++pNode;
+			pNode->next = MovePointer(pNode, m_size);
+			pNode = pNode->next;
 		}
 		pNode->next = pCur;
 	}

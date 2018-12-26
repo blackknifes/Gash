@@ -1,4 +1,5 @@
 #include "GAsyncIO.h"
+#include "../platform/GEventPool.h"
 
 static std::atomic<size_t> s_ioCount = 0;
 
@@ -17,14 +18,17 @@ GAsyncIO::GAsyncIO(GIODevicePtr pDevice, IOType type, const Callback& compCall /
 	m_dwTransferSize(0),
 	m_pIODevice(pDevice),
 	m_pBufferData(nullptr), m_bufferSize(0),
+	m_state(IO_Pending),
 	m_callback(compCall)
 {
+	memset(&m_overlapped, 0, sizeof(m_overlapped));
 	++s_ioCount;
 }
 
 GAsyncIO::~GAsyncIO()
 {
 	freeBuffer();
+	clearEvent();
 	--s_ioCount;
 }
 
@@ -89,10 +93,48 @@ GIODevicePtr GAsyncIO::getDevice() const
 	return m_pIODevice;
 }
 
+void GAsyncIO::setState(State state)
+{
+	m_state = state;
+}
+
+GAsyncIO::State GAsyncIO::getState() const
+{
+	return m_state;
+}
+
+void GAsyncIO::setupEvent()
+{
+	if (!m_event)
+	{
+		m_event = GEventPool::PopEvent();
+		m_overlapped.hEvent = m_event->getNativeHandle();
+	}
+}
+
+bool GAsyncIO::waitEvent(DWORD timeout)
+{
+	if (m_event)
+		return m_event->wait(timeout);
+	return false;
+}
+
+void GAsyncIO::clearEvent()
+{
+	if (!m_event)
+		return;
+	GEventPool::PushEvent(m_event);
+	m_event = nullptr;
+	m_overlapped.hEvent = nullptr;
+}
+
 void GAsyncIO::OnComplete(LPOVERLAPPED pOverlapped, DWORD dwTransferSize, ULONG_PTR compKey)
 {
 	GAsyncIOPtr pAsyncIO = GAsyncIO::GetAsyncIO(pOverlapped);
 	pAsyncIO->Release();
+	if (pAsyncIO->m_state == IO_End)
+		return;
+
 	pAsyncIO->m_dwTransferSize += dwTransferSize;
 
 	switch (pAsyncIO->m_type)

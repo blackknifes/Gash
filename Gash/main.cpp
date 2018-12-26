@@ -39,6 +39,11 @@
 
 #include "ares.h"
 #include "base/device/GFileDevice.h"
+#include "base/io/GNSLookup.h"
+#include "base/GErrno.h"
+#include "base/io/sync/GSocket.h"
+#include "base/io/GFile.h"
+#include "base/stream/GGUnzipStream.h"
 
 const char buf[] = "GET / HTTP/1.1\r\n\r\n";
 
@@ -131,6 +136,17 @@ void InitSocketFunctions(ares_channel channel, HANDLE hIOCP)
 	ares_set_socket_functions(channel, &functions, pQuery);
 }
 
+const char req[] = "GET / HTTP/1.1\r\n"
+"Host: www.zhiqim.com\r\n"
+"Connection: keep-alive\r\n"
+"Pragma: no-cache\r\n"
+"Cache-Control: no-cache\r\n"
+"Upgrade-Insecure-Requests: 1\r\n"
+"User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36\r\n"
+"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
+"Accept-Encoding: gzip, deflate, br\r\n"
+"Accept-Language: zh-CN,zh;q=0.9,en;q=0.8\r\n\r\n";
+
 int main()
 {
 	// 	Win32BaseTypeRegister();
@@ -192,12 +208,32 @@ int main()
 // 	ares_library_cleanup();
 // 	WSACleanup();
 
+	GSocket socket;
+	bool result = socket.connect(L"www.zlib.net", 80);
+	socket.write(req, sizeof(req) - 1);
 
-	GFileDevicePtr fileDevice = GFileDevice::Create(L"E:/Test.txt", GFileDevice::FileOpen);
-	if (!fileDevice->open())
-		return -1;
-	fileDevice->writeSync("0123456789", 10);
-	fileDevice->close();
+	char buf[4096];
+	size_t readsize;
+	GBufferStreamPtr pBufferStream = GBufferStream::CreatePooled();
+	GGUnzipStreamPtr pGZip = GGUnzipStream::CreatePooled(pBufferStream);
+
+	readsize = socket.read(buf, sizeof(buf));
+	{
+		GBufferIO buffer;
+		buffer.writeSync(buf, readsize);
+		unsigned char buf2[4096] = {};
+		while (buffer.readline(buf2, sizeof(buf2)) != 0) {}
+		readsize = buffer.readSync(buf, buffer.size());
+		pGZip->write(buf, readsize);
+	}
+
+	while ((readsize = socket.read(buf, sizeof(buf))) != 0)
+	{
+		if(readsize == -1)
+			break;
+		pGZip->write(buf, readsize);
+	}
+
 
 	_getch();
 	return 0;

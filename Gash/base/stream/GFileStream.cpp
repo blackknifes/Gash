@@ -4,9 +4,9 @@ GFileInputStream::GFileInputStream(const GString& path)
 {
 	setDevice(GFileDevice::Create(
 		path, 
-		GFileDevice::FileCreateOnNotExist, 
-		GFileDevice::ModeRead,
-		GFileDevice::ShareRead | GFileDevice::ShareWrite | GFileDevice::ShareDelete));
+		GOperation::FileCreateOnNotExist,
+		GFileMode::ModeRead,
+		GFileShareMode::ShareRead | GFileShareMode::ShareWrite | GFileShareMode::ShareDelete));
 }
 
 size_t GFileInputStream::read(void* pData, size_t _size)
@@ -18,9 +18,9 @@ GFileOutputStream::GFileOutputStream(const GString& path)
 {
 	setDevice(GFileDevice::Create(
 		path,
-		GFileDevice::FileCreate, 
-		GFileDevice::ModeWrite, 
-		GFileDevice::ShareRead | GFileDevice::ShareDelete));
+		GOperation::FileCreate, 
+		GFileMode::ModeWrite, 
+		GFileShareMode::ShareRead | GFileShareMode::ShareDelete));
 }
 
 void GFileOutputStream::write(const void* pData, size_t _size)
@@ -40,9 +40,9 @@ void GFileOutputStream::end()
 
 GFileStream::GFileStream(
 	const GString& path, 
-	Operations op /*= Operation::Create*/, 
-	Mode mode /*= Mode::ModeReadWrite*/, 
-	ShareModes shareMode /*= ShareMode::ShareRead | ShareMode::ShareWrite | ShareMode::ShareDelete */)
+	GOperations op /*= Operation::Create*/, 
+	GFileMode mode /*= Mode::ModeReadWrite*/,
+	GFileShareModes shareMode /*= ShareMode::ShareRead | ShareMode::ShareWrite | ShareMode::ShareDelete */)
 {
 	setDevice(new GFileDevice(path, op, mode, shareMode));
 }

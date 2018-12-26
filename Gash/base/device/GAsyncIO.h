@@ -6,6 +6,7 @@
 #include "../io/GIODevice.h"
 #include "../io/GBufferIO.h"
 #include <functional>
+#include "../platform/GEvent.h"
 
 GREFPTR_DEF(GAsyncIO);
 
@@ -27,6 +28,13 @@ public:
 		IO_DisConnect
 	};
 
+	enum State
+	{
+		IO_Pending,
+		IO_Finished,
+		IO_End
+	};
+
 	static GAsyncIOPtr GetAsyncIO(void* overlapped);
 	static GAsyncIOPtr CreateIO(GIODevicePtr pDevice, IOType type, const Callback& compCall = nullptr);
 
@@ -43,6 +51,13 @@ public:
 	void* getBufferData();
 	GIODevicePtr getDevice() const;
 
+	void setState(State state);
+	State getState() const;
+
+	void setupEvent();
+	bool waitEvent(DWORD timeout);
+	void clearEvent();
+
 	static void OnComplete(LPOVERLAPPED pOverlapped, DWORD dwTransferSize, ULONG_PTR compKey);
 	static bool HasPending();
 private:
@@ -54,6 +69,8 @@ private:
 	void* m_pBufferData;
 	size_t m_bufferSize;
 	GIODevicePtr m_pIODevice;
+	State m_state;
+	GEventPtr m_event;
 	Callback m_callback;
 };
 #endif

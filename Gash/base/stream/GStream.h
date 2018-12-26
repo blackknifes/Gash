@@ -13,7 +13,7 @@ class GInputStream;
 GREFPTR_DEF(GOutputStream);
 GREFPTR_DEF(GInputStream);
 
-class GInputStream: public virtual GStreamDevice
+class GInputStream: public virtual GObject
 {
 public:
 	virtual size_t read(void* pData, size_t _size) = 0;
@@ -43,7 +43,7 @@ public:
 	virtual const GInputStream& operator>>(GDataArray& val);
 };
 
-class GOutputStream : public virtual GStreamDevice
+class GOutputStream : public virtual GObject
 {
 public:
 	virtual void write(const void* pData, size_t _size) = 0;

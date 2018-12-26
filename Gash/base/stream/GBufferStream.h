@@ -5,7 +5,7 @@
 
 GREFPTR_DEF(GBufferStream);
 
-class GBufferStream: public GInputStream, public GOutputStream
+class GBufferStream: public GInputStream, public GOutputStream, public virtual GStreamDevice
 {
 public:
 	GBufferStream();

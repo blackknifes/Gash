@@ -916,6 +916,27 @@ GString GString::clone() const
 	return *this;
 }
 
+bool GString::isIp() const
+{
+	return isIpV4() || isIpV6();
+}
+
+bool GString::isIpV4() const
+{
+	static std::wregex re = std::wregex(LR"(^(\d{1,3}\.){3}\d{1,3}$)");
+	if (m_string.size() < 7)
+		return false;
+	return std::regex_match(m_string, re);
+}
+
+bool GString::isIpV6() const
+{
+	static std::wregex re = std::wregex(LR"(^([\da-zA-Z]{1,4}:){7}[\da-zA-Z]{1,4}$)");
+	if (m_string.size() < 16)
+		return false;
+	return std::regex_match(m_string, re);
+}
+
 bool GString::operator==(const wchar_t* str) const
 {
 	return m_string == str;
