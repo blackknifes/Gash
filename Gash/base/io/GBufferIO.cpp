@@ -51,6 +51,8 @@ bool GBufferIO::read(size_t size, const ReadCallback& callback)
 
 size_t GBufferIO::writeSync(const void* pData, size_t _size)
 {
+	if (_size == 0)
+		return 0;
 	reserve(m_writeOffset + _size);
 	size_t total = _size;
 	size_t index = SizeOfBuffer(m_writeOffset);

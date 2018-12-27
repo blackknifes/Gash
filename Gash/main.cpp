@@ -41,9 +41,13 @@
 #include "base/device/GFileDevice.h"
 #include "base/io/GNSLookup.h"
 #include "base/GErrno.h"
-#include "base/io/sync/GSocket.h"
+#include "base/io/sync/GSocketSync.h"
 #include "base/io/GFile.h"
-#include "base/stream/GGUnzipStream.h"
+#include "base/stream/GGUncompressStream.h"
+#include "base/io/sync/GTLSSocketSync.h"
+#include "base/stream/GTransformStream.h"
+#include "base/stream/GUnpackStream.h"
+#include "base/stream/GHttpParserStream.h"
 
 const char buf[] = "GET / HTTP/1.1\r\n\r\n";
 
@@ -137,7 +141,7 @@ void InitSocketFunctions(ares_channel channel, HANDLE hIOCP)
 }
 
 const char req[] = "GET / HTTP/1.1\r\n"
-"Host: www.zhiqim.com\r\n"
+"Host: www.baidu.com\r\n"
 "Connection: keep-alive\r\n"
 "Pragma: no-cache\r\n"
 "Cache-Control: no-cache\r\n"
@@ -208,32 +212,33 @@ int main()
 // 	ares_library_cleanup();
 // 	WSACleanup();
 
-	GSocket socket;
-	bool result = socket.connect(L"www.zlib.net", 80);
-	socket.write(req, sizeof(req) - 1);
+	GTLSSocketSync socket;
 
-	char buf[4096];
-	size_t readsize;
-	GBufferStreamPtr pBufferStream = GBufferStream::CreatePooled();
-	GGUnzipStreamPtr pGZip = GGUnzipStream::CreatePooled(pBufferStream);
+	char buf[4096] = {};
+	int readsize;
+	bool result = socket.connect(L"www.baidu.com", 443);
+	readsize = socket.write(req, sizeof(req) - 1);
 
-	readsize = socket.read(buf, sizeof(buf));
-	{
-		GBufferIO buffer;
-		buffer.writeSync(buf, readsize);
-		unsigned char buf2[4096] = {};
-		while (buffer.readline(buf2, sizeof(buf2)) != 0) {}
-		readsize = buffer.readSync(buf, buffer.size());
-		pGZip->write(buf, readsize);
-	}
+	GHttpParserStreamPtr httpParser = GHttpParserStream::Create();
 
-	while ((readsize = socket.read(buf, sizeof(buf))) != 0)
-	{
-		if(readsize == -1)
-			break;
-		pGZip->write(buf, readsize);
-	}
+	httpParser->setStatusLineCallback([](const char* version, int statusCode, const char* statusMessage) {
+		printf("%s %d %s\n", version, statusCode, statusMessage);
+	});
 
+	httpParser->setHeaderCallback([](const char* key, const char* value) {
+		printf("%s: %s\n", key, value);
+	});
+
+	httpParser->setCookieCallback([](const char* key, const char* value) {
+		printf("%s: %s\n", key, value);
+	});
+
+	GUnpackStreamPtr unpack = GUnpackStream::CreatePooled(httpParser);
+	unpack->setPackTail("\r\n");
+
+	while ((readsize = socket.read(buf, sizeof(buf))) > 0)
+		unpack->write(buf, readsize);
+	unpack->flush();
 
 	_getch();
 	return 0;

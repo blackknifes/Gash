@@ -1,18 +1,19 @@
 #ifndef __GGZIPSTREAM_H__
 #define __GGZIPSTREAM_H__
 #include "GStream.h"
+#include "../GDataArray.h"
 
-GREFPTR_DEF(GGUnzipStream);
+GREFPTR_DEF(GGUncompressStream);
 
-class GGUnzipStream: public GOutputStream
+class GGUncompressStream: public GOutputStream
 {
 public:	
-	GGUnzipStream(GOutputStreamPtr os);
-	~GGUnzipStream();
+	GGUncompressStream(GOutputStreamPtr os);
+	~GGUncompressStream();
 	virtual void write(const void* pData, size_t _size) override;
 	virtual void flush() override;
 private:
-	GObjectClassPooled(GGUnzipStream);
+	GObjectClassPooled(GGUncompressStream);
 	GOutputStreamPtr m_pOutputStream;
 	void* m_pGZipContext;
 };

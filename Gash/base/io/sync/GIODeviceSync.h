@@ -6,8 +6,8 @@
 class GIODeviceSync: public virtual GObject
 {
 public:
-	virtual size_t read(void* pData, size_t size) = 0;
-	virtual size_t write(const void* pData, size_t size) = 0;
+	virtual int read(void* pData, size_t size) = 0;
+	virtual int write(const void* pData, size_t size) = 0;
 	virtual void flush() = 0;
 	virtual bool isClosed() const = 0;
 	virtual void close() = 0;

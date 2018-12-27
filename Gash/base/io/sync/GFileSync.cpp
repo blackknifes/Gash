@@ -64,7 +64,7 @@ GFileStats GFileSync::getStats() const
 	return GFileStats();
 }
 
-size_t GFileSync::read(void* pData, size_t size)
+int GFileSync::read(void* pData, size_t size)
 {
 	DWORD readSize = 0;
 	if(ReadFile(m_hFile, pData, (DWORD)size, &readSize, nullptr) == FALSE)
@@ -72,7 +72,7 @@ size_t GFileSync::read(void* pData, size_t size)
 	return readSize;
 }
 
-size_t GFileSync::write(const void* pData, size_t size)
+int GFileSync::write(const void* pData, size_t size)
 {
 	DWORD writeSize = 0;
 	if (WriteFile(m_hFile, pData, (DWORD)size, &writeSize, nullptr) == FALSE)

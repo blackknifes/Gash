@@ -216,9 +216,6 @@
     <ClCompile Include="base\io\GSocketPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="base\io\sync\GSocket.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="base\io\GNSLookup.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -228,7 +225,31 @@
     <ClCompile Include="base\net\GNetEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="base\stream\GGUnzipStream.cpp">
+    <ClCompile Include="base\io\sync\GSocketSync.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\sync\GTLSSocketSync.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GGUncompressStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GUnpackStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GTransformStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\stream\GHttpParserStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\sync\GHttpSync.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\io\GHttpResponse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="base\GTempMemory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -392,9 +413,6 @@
     <ClInclude Include="base\device\GFileDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\device\GSocket.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="base\net\GHttpClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -533,9 +551,6 @@
     <ClInclude Include="base\io\GIOEnums.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\io\sync\GSocket.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="base\io\GSocketPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -548,7 +563,34 @@
     <ClInclude Include="base\net\GNetEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="base\stream\GGUnzipStream.h">
+    <ClInclude Include="base\io\sync\GSocketSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\sync\GTLSSocketSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GGUncompressStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GUnpackStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GTransformStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\stream\GHttpParserStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GHashConst.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\sync\GHttpSync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\io\GHttpResponse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\GTempMemory.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

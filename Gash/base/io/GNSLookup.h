@@ -23,6 +23,8 @@ public:
 	~GNSLookup();
 
 	std::vector<GAddrInfo> lookupV4(const GString& ns, int port = 0);
+	std::vector<GAddrInfo> lookupV6(const GString& ns, int port = 0);
+	bool getHostByNameV4(GAddrInfo* addr, int* addrlen, const GString& host, int port);
 
 	GString toString(GAddrInfo* addr) const;
 
@@ -33,5 +35,5 @@ private:
 };
 
 std::vector<GAddrInfo> GNSLookupV4(const GString& ns, int port = 0);
-
+bool GGetHostByNameV4(GAddrInfo* addr, int* addrlen, const GString& host, int port);
 #endif

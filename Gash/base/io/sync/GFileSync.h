@@ -15,8 +15,8 @@ public:
 	virtual void* getNativeHandle() const override;
 	size_t getSize() const;
 	GFileStats getStats() const;
-	virtual size_t read(void* pData, size_t size) override;
-	virtual size_t write(const void* pData, size_t size) override;
+	virtual int read(void* pData, size_t size) override;
+	virtual int write(const void* pData, size_t size) override;
 private:
 	GObjectClassPooled(GFileSync);
 	HANDLE m_hFile;

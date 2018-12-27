@@ -3,25 +3,25 @@
 #include "GIODeviceSync.h"
 #include "../GSocketPool.h"
 
-class GSocket: public GIODeviceSync
+class GSocketSync: public GIODeviceSync
 {
 public:
-	GSocket(GProtocol protocol = Protocol_TCP);
-	~GSocket();
+	GSocketSync(GProtocol protocol = Protocol_TCP);
+	~GSocketSync();
 
 	bool connect(const GString& host, int port);
 	void disconnect();
 	void close();
 
-	virtual size_t read(void* pData, size_t size) override;
-	virtual size_t write(const void* pData, size_t size) override;
+	virtual int read(void* pData, size_t size) override;
+	virtual int write(const void* pData, size_t size) override;
 	virtual void flush() override;
 	virtual bool isClosed() const override;
 	virtual void* getNativeHandle() const override;
 	GProtocol getProtocol() const;
 
 private:
-	GObjectClassPooled(GSocket);
+	GObjectClassPooled(GSocketSync);
 	SOCKET m_socket;
 	GProtocol m_protocol;
 };
