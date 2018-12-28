@@ -190,6 +190,7 @@
     <ClCompile Include="base\net\GHttpClient.cpp" />
     <ClCompile Include="base\device\GIOCallback.cpp" />
     <ClCompile Include="base\net\GNetEngine.cpp" />
+    <ClCompile Include="base\parser\GParser.cpp" />
     <ClCompile Include="base\platform\GEvent.cpp" />
     <ClCompile Include="base\platform\GEventPool.cpp" />
     <ClCompile Include="base\platform\win32\GWin32Event.cpp" />
@@ -292,6 +293,7 @@
     <ClInclude Include="base\net\GHttpClient.h" />
     <ClInclude Include="base\device\GIOCallback.h" />
     <ClInclude Include="base\net\GNetEngine.h" />
+    <ClInclude Include="base\parser\GParser.h" />
     <ClInclude Include="base\platform\GEvent.h" />
     <ClInclude Include="base\platform\GEventPool.h" />
     <ClInclude Include="base\platform\GService.h" />

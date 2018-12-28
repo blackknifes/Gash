@@ -233,12 +233,15 @@ int main()
 		printf("%s: %s\n", key, value);
 	});
 
-	GUnpackStreamPtr unpack = GUnpackStream::CreatePooled(httpParser);
-	unpack->setPackTail("\r\n");
+	httpParser->setBodyCallback([](const void* data, size_t size) {
+		std::string str = GString::FromEncoding((char*)data, size, EncodingUtf8).toAnsi();
+		printf("%s\n", str.data());
+	});
+
 
 	while ((readsize = socket.read(buf, sizeof(buf))) > 0)
-		unpack->write(buf, readsize);
-	unpack->flush();
+		httpParser->write(buf, readsize);
+	httpParser->flush();
 
 	_getch();
 	return 0;

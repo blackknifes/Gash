@@ -9,6 +9,7 @@
 #define HTTP_PARSER_CONTENT 3
 #define HTTP_PARSER_CHUNKED_LENGTH 4
 #define HTTP_PARSER_CHUNKED_CONTENT 5
+#define HTTP_PARSER_END 5
 #define HTTP_PARSER_ERROR -1
 
 typedef std::pair<const char*, const char*> StrPair;
@@ -103,11 +104,11 @@ GHttpParserStreamPtr GHttpParserStream::Create()
 
 GHttpParserStream::GHttpParserStream()
 	: m_state(HTTP_PARSER_STATUSLINE),
-	m_contentLength(0), m_nextChunkedLength(0), 
+	m_expectIndex(0),
+	m_contentLength(0), m_remaingSize(0), 
 	m_inflateStream(nullptr),
 	m_hasContentLength(false), m_hasChunked(false), m_isGZip(false)
 {
-
 }
 
 GHttpParserStream::~GHttpParserStream()
@@ -156,10 +157,7 @@ void GHttpParserStream::parseHeaderLine(const void* pData, size_t _size)
 		if (m_hasChunked)
 			m_state = HTTP_PARSER_CHUNKED_LENGTH;
 		else if (m_hasContentLength)
-		{
 			m_state = HTTP_PARSER_CONTENT;
-			
-		}
 		else
 			setError();
 		return;
@@ -192,35 +190,34 @@ void GHttpParserStream::parseContent(const void* pData, size_t _size)
 	if (!m_isGZip)
 		return m_bodyCallback(pData, _size);
 
-	z_streamp zlibStream = (z_streamp)m_inflateStream;
-	Bytef buf[0x4000] = {};
-
-	int result;
-	zlibStream->next_in = (Bytef*)pData;
-	zlibStream->avail_in = _size;
-	do 
-	{
-		zlibStream->next_out = buf;
-		zlibStream->avail_out = sizeof(buf);
-		result = inflate(zlibStream, Z_SYNC_FLUSH);
-		if(result == Z_OK || result == Z_BUF_ERROR)
-			m_bodyCallback(pData, sizeof(buf) - zlibStream->avail_out);
-	} while (zlibStream->avail_in != 0 && result != Z_STREAM_END);
-	if (result == Z_STREAM_END)
-	{
-		inflateEnd(zlibStream);
-		GDestroyObject(zlibStream);
-	}
+	inflateData(pData, _size);
 }
 
 void GHttpParserStream::parseChunkedLength(const void* pData, size_t _size)
 {
-	
+	if (_size >= 16)
+		return setError();
+	char buf[16];
+	*std::copy((char*)pData, (char*)pData + _size, buf) = 0;
+	m_remaingSize = strtoull(buf, nullptr, 16);
+	if (m_remaingSize == 0)
+	{
+		m_state = HTTP_PARSER_END;
+		return;
+	}
+	m_state = HTTP_PARSER_CHUNKED_CONTENT;
 }
 
 void GHttpParserStream::parseChunkedContent(const void* pData, size_t _size)
 {
-
+	if (!m_bodyCallback)
+		return;
+	if (_size != m_remaingSize)
+		return setError();
+	m_state = HTTP_PARSER_CHUNKED_LENGTH;
+	if (!m_isGZip)
+		return m_bodyCallback(pData, _size);
+	inflateData(pData, _size);
 }
 
 void GHttpParserStream::parseHeaderValue(const char* key, const char* value)
@@ -378,8 +375,13 @@ void GHttpParserStream::writeLine()
 			return parseData(nullptr, 0);
 		size_t readsize;
 		readsize = m_bufferIO.readSync(pData, m_bufferIO.size());
-		parseData(pData, m_bufferIO.size());
+		parseData(pData, readsize);
 	});
+}
+
+size_t GHttpParserStream::writeDataWithSize(const void* pData, size_t len)
+{
+	
 }
 
 void GHttpParserStream::parseData(const void* pData, size_t _size)
@@ -411,4 +413,39 @@ void GHttpParserStream::parseData(const void* pData, size_t _size)
 void GHttpParserStream::setError()
 {
 	m_state = HTTP_PARSER_ERROR;
+}
+
+void GHttpParserStream::inflateData(const void* pData, size_t _size)
+{
+	z_streamp zlibStream = (z_streamp)m_inflateStream;
+	Bytef buf[0x4000] = {};
+
+	int result;
+	zlibStream->next_in = (Bytef*)pData;
+	zlibStream->avail_in = _size;
+	do
+	{
+		bool bBreak = false;
+		zlibStream->next_out = buf;
+		zlibStream->avail_out = sizeof(buf);
+		result = inflate(zlibStream, Z_SYNC_FLUSH);
+		switch (result)
+		{
+		case Z_OK:
+		case Z_BUF_ERROR:
+			m_bodyCallback(buf, sizeof(buf) - zlibStream->avail_out);
+			break;
+		default:
+			bBreak = true;
+			break;
+		}
+		if (bBreak)
+			break;
+	} while (zlibStream->avail_in != 0);
+	if (result == Z_STREAM_END)
+	{
+		inflateEnd(zlibStream);
+		GDestroyObject(zlibStream);
+		zlibStream = nullptr;
+	}
 }

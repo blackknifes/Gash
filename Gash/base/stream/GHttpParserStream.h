@@ -42,21 +42,26 @@ public:
 	void setBodyCallback(const BodyCallback& cb);
 	void setCookieCallback(const CookieCallback& cb);
 	
-	void writeData(const void* pData, size_t _size);
-	void writeLine();
-	void parseData(const void* pData, size_t _size);
 private:
 	GObjectClassPooled(GHttpParserStream);
 	void setError();
+	void inflateData(const void* pData, size_t _size);
+
+
+	void writeData(const void* pData, size_t _size);
+	void writeLine();
+	size_t writeDataWithSize(const void* pData, size_t len);
+	void parseData(const void* pData, size_t _size);
+
 	StatusLineCallback m_statusLineCallback;
 	HeaderCallback m_headerCallback;
 	BodyCallback m_bodyCallback;
 	CookieCallback m_cookieCallback;
 	GBufferIO m_bufferIO;
-	size_t m_expectIndex;
 	int m_state;
+	size_t m_expectIndex;
 	size_t m_contentLength;
-	size_t m_nextChunkedLength;
+	size_t m_remaingSize;
 	void* m_inflateStream;
 	bool m_hasContentLength;
 	bool m_hasChunked;

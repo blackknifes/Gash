@@ -252,6 +252,9 @@
     <ClCompile Include="base\GTempMemory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="base\parser\GParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\FileDialog\GFileDialog.h">
@@ -591,6 +594,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="base\GTempMemory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="base\parser\GParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
